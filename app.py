@@ -17,6 +17,75 @@ from typing import List, Tuple, Optional
 import uuid
 import hashlib
 
+# Add at the top after imports
+import signal
+import sys
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Add Railway-specific configurations
+def setup_railway_config():
+    """Configure app for Railway deployment"""
+    if os.getenv('RAILWAY_ENVIRONMENT'):
+        # Railway-specific settings
+        os.environ['GRADIO_SHARE'] = 'false'
+        os.environ['DEBUG'] = 'false'
+        
+        # Keep your optimized settings
+        os.environ['MAX_TOKENS'] = '200'  # Your setting
+        os.environ['TEMPERATURE'] = '0.01'  # Your setting
+        
+        # Railway port handling
+        port = os.getenv('PORT', '7860')
+        os.environ['GRADIO_SERVER_PORT'] = port
+        
+        logger.info(f"🚂 Railway deployment detected - Port: {port}")
+
+# Add graceful shutdown handler
+def signal_handler(sig, frame):
+    logger.info('🛑 Graceful shutdown initiated...')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+# Update the main runner section:
+if __name__ == "__main__":
+    # Setup Railway configuration
+    setup_railway_config()
+    
+    logger.info(f"🚀 Starting {bot.bot_name} v{bot.version} - Railway Mode")
+    logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens}")
+    
+    # Get Railway environment variables
+    port = int(os.getenv('PORT', '7860'))
+    railway_url = os.getenv('RAILWAY_STATIC_URL', 'localhost')
+    
+    logger.info(f"🌐 Railway URL: {railway_url}")
+    logger.info(f"🔌 Deployment Port: {port}")
+    
+    # Start health API in background
+    try:
+        api_thread = threading.Thread(target=run_api, daemon=True)
+        api_thread.start()
+        logger.info("🔗 Health API started")
+    except Exception as e:
+        logger.warning(f"API startup issue: {e}")
+    
+    # Launch optimized interface for Railway
+    interface = create_interface()
+    interface.launch(
+        server_name="0.0.0.0",
+        server_port=port,
+        share=False,  # Railway handles public URLs
+        debug=False,
+        show_error=True,
+        prevent_thread_lock=False,
+        quiet=True  # Reduce Railway logs
+    )
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
