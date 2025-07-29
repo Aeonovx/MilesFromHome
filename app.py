@@ -16,75 +16,15 @@ from datetime import datetime
 from typing import List, Tuple, Optional
 import uuid
 import hashlib
-
-# Add at the top after imports
 import signal
 import sys
-from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
-
-# Add Railway-specific configurations
-def setup_railway_config():
-    """Configure app for Railway deployment"""
-    if os.getenv('RAILWAY_ENVIRONMENT'):
-        # Railway-specific settings
-        os.environ['GRADIO_SHARE'] = 'false'
-        os.environ['DEBUG'] = 'false'
-        
-        # Keep your optimized settings
-        os.environ['MAX_TOKENS'] = '200'  # Your setting
-        os.environ['TEMPERATURE'] = '0.01'  # Your setting
-        
-        # Railway port handling
-        port = os.getenv('PORT', '7860')
-        os.environ['GRADIO_SERVER_PORT'] = port
-        
-        logger.info(f"🚂 Railway deployment detected - Port: {port}")
-
-# Add graceful shutdown handler
-def signal_handler(sig, frame):
-    logger.info('🛑 Graceful shutdown initiated...')
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-
-# Update the main runner section:
-if __name__ == "__main__":
-    # Setup Railway configuration
-    setup_railway_config()
-    
-    logger.info(f"🚀 Starting {bot.bot_name} v{bot.version} - Railway Mode")
-    logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens}")
-    
-    # Get Railway environment variables
-    port = int(os.getenv('PORT', '7860'))
-    railway_url = os.getenv('RAILWAY_STATIC_URL', 'localhost')
-    
-    logger.info(f"🌐 Railway URL: {railway_url}")
-    logger.info(f"🔌 Deployment Port: {port}")
-    
-    # Start health API in background
-    try:
-        api_thread = threading.Thread(target=run_api, daemon=True)
-        api_thread.start()
-        logger.info("🔗 Health API started")
-    except Exception as e:
-        logger.warning(f"API startup issue: {e}")
-    
-    # Launch optimized interface for Railway
-    interface = create_interface()
-    interface.launch(
-        server_name="0.0.0.0",
-        server_port=port,
-        share=False,  # Railway handles public URLs
-        debug=False,
-        show_error=True,
-        prevent_thread_lock=False,
-        quiet=True  # Reduce Railway logs
-    )
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("python-dotenv not available, using system environment variables")
 
 # Configure logging
 logging.basicConfig(
@@ -357,7 +297,8 @@ def health():
         "version": bot.version,
         "model": bot.model_name,
         "questions_answered": bot.total_questions,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "railway": os.getenv('RAILWAY_ENVIRONMENT') == 'production'
     })
 
 def run_api():
@@ -489,16 +430,48 @@ def create_interface():
         
     return interface
 
-# Main runner
+# Railway-specific configurations (MOVED TO CORRECT LOCATION - AFTER BOT CREATION)
+def setup_railway_config():
+    """Configure app for Railway deployment"""
+    if os.getenv('RAILWAY_ENVIRONMENT') == 'production':
+        logger.info("🚂 Railway deployment detected")
+        
+        # Railway-specific settings
+        os.environ['GRADIO_SHARE'] = 'false'
+        os.environ['DEBUG'] = 'false'
+        
+        # Get Railway port
+        port = os.getenv('PORT', '7860')
+        railway_url = os.getenv('RAILWAY_STATIC_URL', 'localhost')
+        
+        logger.info(f"🌐 Railway URL: {railway_url}")
+        logger.info(f"🔌 Railway Port: {port}")
+        
+        return int(port)
+    
+    return int(os.getenv('PORT', '7860'))
+
+# Add graceful shutdown handler
+def signal_handler(sig, frame):
+    logger.info('🛑 Graceful shutdown initiated...')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+# Main runner (FIXED - Railway config AFTER bot creation)
 if __name__ == "__main__":
-    logger.info(f"🚀 Starting {bot.bot_name} v{bot.version} - Optimized Mode")
+    logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
     logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens} | Temperature: {bot.temperature}")
+    
+    # Setup Railway configuration (NOW bot exists!)
+    port = setup_railway_config()
     
     # Start health API in background
     try:
         api_thread = threading.Thread(target=run_api, daemon=True)
         api_thread.start()
-        logger.info("🔗 Health API started on port 5001")
+        logger.info("🔗 Health API started")
     except Exception as e:
         logger.warning(f"API startup issue: {e}")
     
@@ -506,8 +479,10 @@ if __name__ == "__main__":
     interface = create_interface()
     interface.launch(
         server_name="0.0.0.0",
-        server_port=int(os.getenv('PORT', '7860')),
-        share=os.getenv('GRADIO_SHARE', 'false').lower() == 'true',
+        server_port=port,
+        share=False,  # Railway handles public URLs
         debug=False,
-        show_error=True
+        show_error=True,
+        prevent_thread_lock=False,
+        quiet=True if os.getenv('RAILWAY_ENVIRONMENT') == 'production' else False
     )
