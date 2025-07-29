@@ -56,18 +56,18 @@ export RAILWAY_ENVIRONMENT=production
 export GRADIO_SHARE=false
 export DEBUG=true  # Temporary for debugging
 
-# Start the health check endpoint first
-echo "🏥 Starting health check endpoint..."
-python -c "
-from flask import Flask
-app = Flask(__name__)
-@app.route('/health')
-def health(): return {'status': 'initializing'}, 200
-" &
-HEALTH_PID=$!
+# # Start the health check endpoint first
+# echo "🏥 Starting health check endpoint..."
+# python -c "
+# from flask import Flask
+# app = Flask(__name__)
+# @app.route('/health')
+# def health(): return {'status': 'initializing'}, 200
+# " &
+# HEALTH_PID=$!
 
-# Give health endpoint time to start
-sleep 5
+# # Give health endpoint time to start
+# sleep 5
 
 echo "🌐 Starting iTethr Bot on port $PORT..."
 # Start the main application

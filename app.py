@@ -486,8 +486,8 @@ if __name__ == "__main__":
     
     # Start health API in background
     try:
-        # api_thread = threading.Thread(target=run_api, daemon=True)
-        # api_thread.start()
+        api_thread = threading.Thread(target=run_api, daemon=True)
+        api_thread.start()
         logger.info("🔗 Health API started")
     except Exception as e:
         logger.warning(f"API startup issue: {e}")

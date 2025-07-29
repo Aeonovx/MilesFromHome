@@ -54,7 +54,7 @@ RUN chown -R nobody:nogroup /app && \
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-7860}/health || exit 1
+    CMD curl -f http://localhost:${PORT:-5001}/health || exit 1
 
 # Expose necessary ports
 EXPOSE 7860 5001 11434
