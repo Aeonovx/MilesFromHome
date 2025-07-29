@@ -1,22 +1,24 @@
-# Core iTethr Bot Dependencies - Railway Optimized
-gradio==4.44.0
-chromadb==0.4.22
-sentence-transformers==2.2.2
-ollama==0.1.7
-PyYAML==6.0.1
-Flask>=2.0.0
-
-# AI/ML Dependencies - Railway Compatible
-torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
-transformers==4.36.0
-numpy==1.24.4
-tokenizers==0.15.0
-
-# Enhanced Features
-python-dotenv==1.0.0
-requests==2.31.0
-urllib3==2.0.7
-
-# Railway Performance
+# Core Web Framework
+Flask==2.0.0
+Werkzeug==2.0.0
 gunicorn==21.2.0
-psutil==5.9.6
+
+# AI and ML Libraries
+--find-links https://download.pytorch.org/whl/cpu
+torch==2.1.0+cpu
+transformers==4.35.0
+ollama==0.1.7
+
+# UI Framework
+gradio==4.7.1
+
+# Utilities
+requests==2.31.0
+python-dotenv==1.0.0
+PyYAML==6.0.1
+numpy==1.24.3
+tqdm==4.66.1
+
+# API and Integration
+flask-cors==4.0.0
+aiohttp==3.8.5
