@@ -277,3 +277,420 @@
 2025-07-29 15:20:41,274 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
 2025-07-29 15:20:41,293 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
 2025-07-29 15:20:41,918 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:46:54,237 - INFO - Loading embeddings model...
+2025-07-29 22:46:54,290 - INFO - Use pytorch device_name: mps
+2025-07-29 22:46:54,290 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 22:47:00,205 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 22:47:05,412 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 22:47:07,981 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 22:47:07,982 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 22:47:07,982 - INFO - ✅ All components optimized and ready!
+2025-07-29 22:47:07,982 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 22:47:07,985 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 22:47:07,986 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 22:47:07,986 - INFO - 🚂 Railway deployment detected
+2025-07-29 22:47:07,986 - INFO - 🌐 Railway URL: localhost
+2025-07-29 22:47:07,986 - INFO - 🔌 Railway Port: 7860
+2025-07-29 22:47:07,986 - INFO - 🔗 Health API started
+2025-07-29 22:47:08,053 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 22:47:08,059 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 22:47:08,621 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 22:47:08,645 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 22:47:08,999 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:47:31,218 - INFO - 192.168.176.1 - - [29/Jul/2025 22:47:31] "[33mGET / HTTP/1.1[0m" 404 -
+2025-07-29 22:47:31,355 - INFO - 192.168.176.1 - - [29/Jul/2025 22:47:31] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-29 22:50:20,458 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 22:50:37,465 - INFO - Loading embeddings model...
+2025-07-29 22:50:37,500 - INFO - Use pytorch device_name: mps
+2025-07-29 22:50:37,500 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 22:50:43,338 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 22:50:48,313 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 22:50:50,879 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 22:50:50,880 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 22:50:50,880 - INFO - ✅ All components optimized and ready!
+2025-07-29 22:50:50,880 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 22:50:50,881 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 22:50:50,881 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 22:50:50,882 - INFO - 🚂 Railway deployment detected
+2025-07-29 22:50:50,882 - INFO - 🌐 Railway URL: localhost
+2025-07-29 22:50:50,882 - INFO - 🔌 Railway Port: 7860
+2025-07-29 22:50:50,882 - INFO - 🔗 Health API started
+2025-07-29 22:50:50,950 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 22:50:50,950 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 22:50:51,464 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 22:50:51,486 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 22:50:52,187 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:52:58,224 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 22:53:46,760 - INFO - Loading embeddings model...
+2025-07-29 22:53:46,787 - INFO - Use pytorch device_name: mps
+2025-07-29 22:53:46,787 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 22:53:51,441 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 22:53:56,494 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 22:53:59,113 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 22:53:59,113 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 22:53:59,113 - INFO - ✅ All components optimized and ready!
+2025-07-29 22:53:59,113 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 22:53:59,115 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 22:53:59,115 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 22:53:59,115 - INFO - 🚂 Railway deployment detected
+2025-07-29 22:53:59,115 - INFO - 🌐 Railway URL: localhost
+2025-07-29 22:53:59,115 - INFO - 🔌 Railway Port: 7860
+2025-07-29 22:53:59,115 - INFO - 🔗 Health API started
+2025-07-29 22:53:59,176 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 22:53:59,183 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 22:53:59,734 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 22:53:59,760 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 22:54:00,502 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:56:07,341 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 22:56:22,523 - INFO - Loading embeddings model...
+2025-07-29 22:56:22,550 - INFO - Use pytorch device_name: mps
+2025-07-29 22:56:22,550 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 22:56:28,792 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 22:56:33,990 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 22:56:36,636 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 22:56:36,636 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 22:56:36,636 - INFO - ✅ All components optimized and ready!
+2025-07-29 22:56:36,636 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 22:56:36,637 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 22:56:36,638 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 22:56:36,638 - INFO - 🚂 Railway deployment detected
+2025-07-29 22:56:36,638 - INFO - 🌐 Railway URL: localhost
+2025-07-29 22:56:36,638 - INFO - 🔌 Railway Port: 7860
+2025-07-29 22:56:36,638 - INFO - 🔗 Health API started
+2025-07-29 22:56:36,711 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 22:56:36,712 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 22:56:37,195 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 22:56:37,216 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 22:56:38,017 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:57:22,169 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 22:57:34,712 - INFO - Loading embeddings model...
+2025-07-29 22:57:34,741 - INFO - Use pytorch device_name: mps
+2025-07-29 22:57:34,741 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 22:57:39,275 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 22:57:44,502 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 22:57:47,214 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 22:57:47,214 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 22:57:47,214 - INFO - ✅ All components optimized and ready!
+2025-07-29 22:57:47,214 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 22:57:47,216 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 22:57:47,216 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 22:57:47,216 - INFO - 🚂 Railway deployment detected
+2025-07-29 22:57:47,216 - INFO - 🌐 Railway URL: localhost
+2025-07-29 22:57:47,216 - INFO - 🔌 Railway Port: 7860
+2025-07-29 22:57:47,216 - INFO - 🔗 Health API started
+2025-07-29 22:57:47,290 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 22:57:47,291 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 22:57:47,783 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 22:57:47,803 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 22:57:48,252 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 22:58:04,289 - INFO - Found relevant content (distance: 0.98) from itethr-overview.txt
+2025-07-29 22:58:04,289 - INFO - Found relevant content (distance: 1.00) from itethr-overview.txt
+2025-07-29 22:58:17,978 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-07-29 22:58:17,982 - INFO - ⚡ Response generated in 14.65s
+2025-07-29 23:03:43,636 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:04:03,468 - INFO - Loading embeddings model...
+2025-07-29 23:04:03,501 - INFO - Use pytorch device_name: mps
+2025-07-29 23:04:03,501 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:04:09,263 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:04:14,634 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:04:17,424 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:04:17,424 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:04:17,424 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:04:17,425 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:04:17,426 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:04:17,426 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:04:17,426 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:04:17,426 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:04:17,426 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:04:17,427 - INFO - 🔗 Health API started
+2025-07-29 23:04:17,496 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:04:17,496 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:04:18,031 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:04:18,053 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:04:18,420 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:07:43,351 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:08:05,891 - INFO - Loading embeddings model...
+2025-07-29 23:08:05,918 - INFO - Use pytorch device_name: mps
+2025-07-29 23:08:05,918 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:08:10,693 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:08:16,150 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:08:18,992 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:08:18,992 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:08:18,992 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:08:18,992 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:08:18,994 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:08:18,994 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:08:18,994 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:08:18,994 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:08:18,994 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:08:18,994 - INFO - 🔗 Health API started
+2025-07-29 23:08:19,068 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:08:19,069 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:08:19,553 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:08:19,574 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:08:20,035 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:09:07,657 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:09:21,193 - INFO - Loading embeddings model...
+2025-07-29 23:09:21,221 - INFO - Use pytorch device_name: mps
+2025-07-29 23:09:21,221 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:09:26,269 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:09:31,817 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:09:34,708 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:09:34,709 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:09:34,709 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:09:34,709 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:09:34,710 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:09:34,711 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:09:34,711 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:09:34,711 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:09:34,711 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:09:34,711 - INFO - 🔗 Health API started
+2025-07-29 23:09:34,784 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:09:34,784 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:09:35,281 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:09:35,302 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:09:35,746 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:14:36,085 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:14:53,594 - INFO - Loading embeddings model...
+2025-07-29 23:14:53,630 - INFO - Use pytorch device_name: mps
+2025-07-29 23:14:53,630 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:14:58,914 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:15:04,519 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:15:07,450 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:15:07,451 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:15:07,451 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:15:07,451 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:15:07,452 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:15:07,453 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:15:07,453 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:15:07,453 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:15:07,453 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:15:07,453 - INFO - 🔗 Health API started
+2025-07-29 23:15:07,512 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:15:07,517 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:15:08,011 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:15:08,031 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:15:08,434 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:17:01,417 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:17:19,749 - INFO - Loading embeddings model...
+2025-07-29 23:17:19,780 - INFO - Use pytorch device_name: mps
+2025-07-29 23:17:19,780 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:17:25,706 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:17:31,441 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:17:34,381 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:17:34,381 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:17:34,381 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:17:34,381 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:17:34,383 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:17:34,383 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:17:34,383 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:17:34,383 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:17:34,383 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:17:34,383 - INFO - 🔗 Health API started
+2025-07-29 23:17:34,437 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:17:34,444 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:17:34,956 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:17:34,977 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:17:35,358 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:21:16,413 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:21:59,881 - INFO - Loading embeddings model...
+2025-07-29 23:21:59,917 - INFO - Use pytorch device_name: mps
+2025-07-29 23:21:59,917 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:22:05,052 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:22:10,668 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:22:13,603 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:22:13,603 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:22:13,603 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:22:13,603 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:22:13,605 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:22:13,605 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:22:13,605 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:22:13,605 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:22:13,605 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:22:13,605 - INFO - 🔗 Health API started
+2025-07-29 23:22:13,676 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:22:13,676 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:22:14,178 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:22:14,201 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:22:14,973 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:27:08,307 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:27:41,570 - INFO - Loading embeddings model...
+2025-07-29 23:27:41,606 - INFO - Use pytorch device_name: mps
+2025-07-29 23:27:41,606 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:27:46,793 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:27:52,678 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:27:55,753 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:27:55,753 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:27:55,753 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:27:55,753 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:27:55,755 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:27:55,755 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:27:55,755 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:27:55,755 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:27:55,755 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:27:55,755 - INFO - 🔗 Health API started
+2025-07-29 23:27:55,838 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:27:55,844 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:27:56,480 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:27:56,502 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:27:56,769 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:41:15,889 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-29 23:41:41,812 - INFO - Loading embeddings model...
+2025-07-29 23:41:41,853 - INFO - Use pytorch device_name: mps
+2025-07-29 23:41:41,853 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:41:47,639 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:41:53,618 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-29 23:41:56,743 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-29 23:41:56,743 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-29 23:41:56,743 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:41:56,743 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-29 23:41:56,745 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-29 23:41:56,745 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:41:56,745 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:41:56,745 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:41:56,745 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:41:56,746 - INFO - 🔗 Health API started
+2025-07-29 23:41:56,818 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:41:56,818 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:41:58,064 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:54:29,246 - INFO - Loading embeddings model...
+2025-07-29 23:54:29,288 - INFO - Use pytorch device_name: mps
+2025-07-29 23:54:29,288 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:54:34,568 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:54:34,726 - INFO - 🔄 Found new/modified document: iTethr-community.txt
+2025-07-29 23:54:38,516 - INFO - 📄 Indexed: iTethr-community.txt (24 chunks)
+2025-07-29 23:54:38,517 - INFO - 🔄 Found new/modified document: itethr-overview.txt
+2025-07-29 23:54:40,402 - INFO - 📄 Indexed: itethr-overview.txt (13 chunks)
+2025-07-29 23:54:40,402 - INFO - ✅ Indexed 2 new/modified documents, 37 total chunks.
+2025-07-29 23:54:40,403 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:54:40,403 - INFO - 🚀 iTethr Assistant v6.1.0 optimized and ready!
+2025-07-29 23:54:40,407 - INFO - 🚀 Starting iTethr Assistant v6.1.0
+2025-07-29 23:54:40,407 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:54:40,407 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:54:40,407 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:54:40,407 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:54:40,407 - INFO - 🔗 Health API started
+2025-07-29 23:54:40,416 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:54:40,416 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:58:07,114 - INFO - Loading embeddings model...
+2025-07-29 23:58:07,154 - INFO - Use pytorch device_name: mps
+2025-07-29 23:58:07,154 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 23:58:12,568 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 23:58:12,744 - INFO - ✅ Knowledge base is up-to-date.
+2025-07-29 23:58:12,745 - INFO - ✅ All components optimized and ready!
+2025-07-29 23:58:12,745 - INFO - 🚀 iTethr Assistant v6.1.0 optimized and ready!
+2025-07-29 23:58:12,746 - INFO - 🚀 Starting iTethr Assistant v6.1.0
+2025-07-29 23:58:12,746 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-29 23:58:12,747 - INFO - 🚂 Railway deployment detected
+2025-07-29 23:58:12,747 - INFO - 🌐 Railway URL: localhost
+2025-07-29 23:58:12,747 - INFO - 🔌 Railway Port: 7860
+2025-07-29 23:58:12,747 - INFO - 🔗 Health API started
+2025-07-29 23:58:12,827 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-29 23:58:12,827 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 23:58:13,314 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 23:58:13,335 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 23:58:14,204 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 23:59:29,753 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-30 00:02:32,815 - INFO - Loading embeddings model...
+2025-07-30 00:02:32,855 - INFO - Use pytorch device_name: mps
+2025-07-30 00:02:32,855 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-30 00:02:38,297 - INFO - Setting up database...
+2025-07-30 00:02:38,329 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-30 00:02:38,417 - INFO - ✅ Knowledge base is up-to-date.
+2025-07-30 00:02:38,417 - INFO - ✅ All components optimized and ready!
+2025-07-30 00:02:38,417 - INFO - 🚀 iTethr Assistant v7.1.0 (Simple UI) optimized and ready!
+2025-07-30 00:02:38,417 - INFO - 🔗 Health API thread started. Check http://localhost:5001/health
+2025-07-30 00:02:38,494 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-30 00:02:38,495 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-30 00:02:39,751 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-30 00:03:56,019 - INFO - Loading embeddings model...
+2025-07-30 00:03:56,052 - INFO - Use pytorch device_name: mps
+2025-07-30 00:03:56,052 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-30 00:04:01,762 - INFO - Setting up database...
+2025-07-30 00:04:01,779 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-30 00:04:01,857 - INFO - ✅ Knowledge base is up-to-date.
+2025-07-30 00:04:01,857 - INFO - ✅ All components optimized and ready!
+2025-07-30 00:04:01,857 - INFO - 🚀 iTethr Assistant v7.2.0 (Simple UI) optimized and ready!
+2025-07-30 00:04:01,858 - INFO - 🔗 Health API thread started. Check http://localhost:5001/health
+2025-07-30 00:04:01,874 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.176.1:5001
+2025-07-30 00:04:01,879 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-30 00:04:02,319 - INFO - 🚀 Launching Gradio interface on http://0.0.0.0:7860
+2025-07-30 00:04:02,613 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-30 00:04:02,635 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-30 00:04:04,253 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-30 00:04:04,254 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-30 00:05:23,476 - INFO - 🛑 Graceful shutdown initiated...
+2025-07-30 00:06:15,341 - INFO - Loading embeddings model...
+2025-07-30 00:06:15,371 - INFO - Use pytorch device_name: mps
+2025-07-30 00:06:15,371 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-30 00:06:20,173 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-30 00:06:26,382 - INFO - 📄 Loaded: iTethr-community.txt (24 chunks)
+2025-07-30 00:06:29,712 - INFO - 📄 Loaded: itethr-overview.txt (13 chunks)
+2025-07-30 00:06:29,712 - INFO - ✅ Total: 2 documents, 37 chunks loaded
+2025-07-30 00:06:29,712 - INFO - ✅ All components optimized and ready!
+2025-07-30 00:06:29,712 - INFO - 🚀 iTethr Assistant v6.0.0 optimized and ready!
+2025-07-30 00:06:29,714 - INFO - 🚀 Starting iTethr Assistant v6.0.0
+2025-07-30 00:06:29,714 - INFO - ⚡ Model: qwen2.5:1.5b | Max Tokens: 200 | Temperature: 0.01
+2025-07-30 00:06:29,714 - INFO - 🚂 Railway deployment detected
+2025-07-30 00:06:29,714 - INFO - 🌐 Railway URL: localhost
+2025-07-30 00:06:29,714 - INFO - 🔌 Railway Port: 7860
+2025-07-30 00:06:29,714 - INFO - 🔗 Health API started
+2025-07-30 00:06:30,259 - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-30 00:06:30,279 - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-30 00:06:30,994 - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-30 00:06:44,784 - INFO - Found relevant content (distance: 0.97) from unknown
+2025-07-30 00:06:44,785 - INFO - Found relevant content (distance: 0.97) from itethr-overview.txt
+2025-07-30 00:06:56,183 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-07-30 00:06:56,185 - INFO - ⚡ Response generated in 12.38s
+2025-07-30 00:38:38,531 - INFO - 🛑 Graceful shutdown initiated...

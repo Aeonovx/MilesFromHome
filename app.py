@@ -286,20 +286,37 @@ ANSWER:"""
 # Initialize optimized bot
 bot = OptimizediTethrBot()
 
-# Health API
+#Health API
 app = Flask(__name__)
 
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({
-        "status": "healthy",
-        "bot": bot.bot_name,
-        "version": bot.version,
-        "model": bot.model_name,
-        "questions_answered": bot.total_questions,
-        "timestamp": datetime.now().isoformat(),
-        "railway": os.getenv('RAILWAY_ENVIRONMENT') == 'production'
-    })
+    try:
+        # Check if Ollama is running
+        ollama_status = "unhealthy"
+        try:
+            response = requests.get('http://localhost:11434/api/tags', timeout=5)
+            if response.status_code == 200:
+                ollama_status = "healthy"
+        except:
+            pass
+
+        return jsonify({
+            "status": "healthy",
+            "bot": bot.bot_name,
+            "version": bot.version,
+            "model": bot.model_name,
+            "questions_answered": bot.total_questions,
+            "ollama_status": ollama_status,
+            "timestamp": datetime.now().isoformat(),
+            "railway": os.getenv('RAILWAY_ENVIRONMENT') == 'production'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
 
 def run_api():
     try:
@@ -469,8 +486,8 @@ if __name__ == "__main__":
     
     # Start health API in background
     try:
-        api_thread = threading.Thread(target=run_api, daemon=True)
-        api_thread.start()
+        # api_thread = threading.Thread(target=run_api, daemon=True)
+        # api_thread.start()
         logger.info("🔗 Health API started")
     except Exception as e:
         logger.warning(f"API startup issue: {e}")
