@@ -4,8 +4,9 @@ Werkzeug==2.0.0
 gunicorn==21.2.0
 
 # AI and ML Libraries
---find-links https://download.pytorch.org/whl/cpu
-torch==2.1.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0
+torchvision==0.16.0
 transformers==4.35.0
 ollama==0.1.7
 
