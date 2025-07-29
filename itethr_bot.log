@@ -1,0 +1,18 @@
+2025-07-29 04:14:24,294 - __main__ - INFO - Loading embeddings model...
+2025-07-29 04:14:24,338 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: mps
+2025-07-29 04:14:24,339 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-29 04:14:30,096 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-07-29 04:14:31,578 - __main__ - INFO - 📄 Loaded: itethr-overview.txt (5 chunks)
+2025-07-29 04:14:31,578 - __main__ - INFO - ✅ Document loading complete:
+2025-07-29 04:14:31,578 - __main__ - INFO -    - Successfully loaded: 1 files
+2025-07-29 04:14:31,578 - __main__ - INFO -    - Total chunks created: 5
+2025-07-29 04:14:31,583 - __main__ - INFO - ✅ All components initialized successfully
+2025-07-29 04:14:31,583 - __main__ - INFO - 🚀 iTethr Assistant v1.0.0 initialized (Session: d951083d)
+2025-07-29 04:14:31,588 - __main__ - INFO - 🚀 Starting iTethr Assistant v1.0.0 - Production Mode
+2025-07-29 04:14:31,588 - __main__ - INFO - 🚀 WhatsApp API server starting on port 5000
+2025-07-29 04:14:31,589 - __main__ - INFO - 📱 WhatsApp API server started
+2025-07-29 04:14:32,078 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-07-29 04:14:32,103 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+2025-07-29 04:14:32,536 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-07-29 04:15:33,681 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-07-29 04:15:33,684 - __main__ - INFO - Response generated in 31.76s

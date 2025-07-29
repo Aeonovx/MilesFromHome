@@ -1,0 +1,289 @@
+iTethr Overview – First Generation
+🌎 Overview
+iTethr is a next-generation community infrastructure platform designed for international
+students, organizations, creators, and global users to build structured communities, offer
+services, and interact through real-time social engagement tools.
+The First Generation of iTethr focuses on a high-impact, scalable MVP with deeply integrated AI
+features, modular spaces, and a core trust-driven social layer.
+This document outlines the full backend architecture, data flows, modules, user journey, and
+developer integration blueprint.
+🌎 User Account System
+✅ Supported Sign-Up Methods
+ Sign Up with Google (OAuth2)
+ Sign Up with Apple (OAuth2)
+ Sign Up with Email + Password (Default Path)
+🌎 Email Sign-Up Flow
+iTethr simplifies the login and onboarding process to minimize friction. Users are onboarded
+through a quick 3-step setup, with progressive profile building handled later from the profile
+screen.
+1. 2. 3. Step 1: Enter Username, Password, (required)
+Step 2: Select Gender (optional), Date of Birth (required)
+Step 3: Interests Selection (optional), Accept Privacy Policy (required)
+After completing onboarding, users land directly in Home with access to their private
+‘You’ chat and any pre-joined community. Full profile customization and setup can be
+done gradually afterward.
+🌐 Identity Fields Stored
+username (unique, lowercase), password_hash, dob, gender (optional) privacy_accepted:
+true, joined_at, last_active , auth_method (email/google/apple)
+🌐 Home Interface Layout
+iTethr introduces a revolutionary and unconventional design that breaks away from traditional
+social apps. Ditching the standard navigation bar, iTethr uses a bubble-based interface that is
+spatial, intuitive, and visually engaging.
+Instead of navigating through tabs, users interact with floating animated bubbles that represent
+their Communities, Loops, and Contacts. It creates an immersive sense of presence rather than
+just movement between screens.
+🌎 Key UI Elements:
+ Top Left: Profile icon for account settings
+ Top Right: Notifications and Marketplace
+ Bottom Center: A persistent Smart Search bar that lets users ask questions or interact
+with Aeono AI anytime
+ Center Bubble UI: Interactive floating circles for Communities, Loops, and Tethr
+connections
+ Floating Create Button: For instantly launching new Posts, Loops, Hubs, or Communities
+This novel layout doesn’t just look different it feels different. It’s designed for flow,
+freedom, and meaningful discovery. A digital landscape where users move naturally
+between moments of interaction, without relying on static menus or navigation tabs.
+🌐 Spaces Architecture (Global Navigation)
+Users land inside a three-space architecture:
+1. Home Space
+ Community Circles joined
+ Circles and Community feeds
+ Private Chats (1-on-1)
+ “You” – a self-chat space for journaling, notes, and drafts
+2. Global Space
+ iFeed (Global feed - Tethrs / Global tabs)
+ Loops (Real-time trending discussion threads)
+3. Favourite Space
+ Pinned: Rooms, Community Plus, Communities, Spaces, Loops
+ Fully user customizable
+➕ Create Button (Action Center)
+Users can create:
+ Post
+ Community Plus (+)
+ Hub (Standard)
+Rooms cannot be created directly, they are created only inside Hubs (single-layer) or
+within a Community Plus by admins.
+ Loop (Mood expression)
+ Space (Personal/Creator)
+Events & Services are created inside the Marketplace module.
+🌐 User Profiles
+iTethr users are at the center of the ecosystem. Whether you’re a student, freelancer, creator,
+or organization member, your profile reflects your identity, reputation, and contributions.
+Each user has a card-style profile that showcases their key identity attributes and engagement
+stats. Alongside their username, every user also has a unique Personal ID, which is more
+reliable and permanent than usernames. This Personal ID ensures long-term discoverability,
+smart search indexing, and future-proof scaling.
+Users can also verify their identity to receive role-specific verification badges such as Student,
+Professional, or Freelancer. This helps build credibility and enhances visibility across the
+platform.
+🌎 Personal Profile
+ Name, Bio, Location, Skills, Interests
+ Tethrd Level – a dynamic score based on your engagement
+ Trust Score – a system-generated credibility score
+ Your posts, offered services, and endorsements from others
+ Unique Personal ID and Username (both searchable)
+ Public profile link for sharing outside the platform
+ Optional verification badge (Student / Freelancer / Professional)
+On iTethr, if User A finds User B, they can send a Tethr Request to connect. There are two types
+of Tethr paths:
+ If User B has a public profile, Tethring happens instantly
+ If User B requires approval, they must accept the request to complete the connection
+Once User A and B are Tethred:
+ They can view each other’s full profile
+ They can send private messages
+ They can request help or offer services
+Tethring is not like ‘follow’ or ‘follow back’ it’s a mutual, consent-based connection system
+designed for meaningful interactions.
+Profiles are discoverable via Aeono and connected across iTethr’s features from chats to
+marketplace and beyond.
+🌎 Business Profile
+Business Profiles are designed for official organizations such as agencies, NGOs, and universities
+that want to offer services, host events, or manage communities on iTethr.
+ Full organization bio with structured details (description, contact info, purpose)
+ Logo, Banner, and team role assignments
+ Showcase active and past service listings
+ Publish and manage events
+ Add external links to their website, social profiles, or other platforms
+ Manage and moderate Communities or Hubs under their domain
+ Verified label indicating their institutional or agency-level status
+🌎 iFeed: Global Content Feed
+iFeed is iTethr’s dynamic global content stream functioning like a fusion of Reddit and X
+(Twitter). It serves as the main space where public posts, announcements, and Loop discussions
+are surfaced and shared globally. Users can like, comment, share, and save posts for
+engagement and follow-up.
+ Two Tabs: Tethrs (Network posts) & Global
+ AI-curated based on:
+o User interests
+o Engagement behavior
+o Loop activity
+🌐 Community System
+🌎 Community Plus (+)
+A multi-layered organizational structure for universities, national communities, NGOs, or large
+organizations. A Community Plus contains multiple Hubs (departments, sub-community) which
+in turn contain Rooms (chat/feed/event units).
+Example Structure:
+ Community Plus → University of Latvia
+o Hub → Department of Computer Science
+ Room → AI Enthusiasts
+In this structure:
+ The Community Plus represents the entire university.
+ Each Hub can represent a department, student organization, or cultural group.
+ Rooms inside the Hub can be used by class batches, project teams, or working
+groups. a university or large organization owns a Community Plus, which contains
+various Hubs (Standard) (based on departments, regions, or interests), and each
+Hub can host multiple
+Rooms (chat, feed, events).
+Key Capabilities:
+ Owns multiple Hubs
+ Admin Roles: Owner, Admin, Member
+ Custom branding, analytics, onboarding tools
+ Ideal for scaling structured social ecosystems
+🌎 Hub (Standard)
+A single-layer community group where users can create and manage Rooms. Ideal for clubs,
+interest groups, regional language communities, or organizing small-scale groups inside or
+outside a Community Plus.
+Hub Features:
+ Create Rooms (chat + feed + events)
+ Add members, assign roles
+ Integrate with Marketplace and Events
+ Access shared feed, chat, announcements
+🌎 Rooms
+The most granular unit inside Hubs or Community Plus. These are like “channels” in Discord or
+“groups” in Telegram, but enhanced with posts, polls, events, and file sharing.
+Room Types & Use Cases:
+ Class chat rooms (e.g., AI Enthusiasts ’25)
+ Event discussion threads (e.g., Hackathon Zone)
+ Project teams (e.g., UI/UX Squad)
+Each Room includes:
+ Feed (announcements, polls)
+ Chat
+ Events
+ Member list
+ Admin tools (pin, mute, remove, insights)
+A single-layer community that can contain Rooms (chat and feed channels). This is best for
+clubs, local student groups, regional language communities, or other single-layer gatherings.
+ Casual or themed groups
+ Chat, Feed, Members, Events, Marketplace
+Shared Features
+ About section
+ Feed (Posts, Polls)
+ Members List
+ Events
+ Marketplace Integration
+🌐 Spaces
+Spaces are personal or creator-centric zones designed for self-organization, creativity, and
+service showcasing. Unlike communities, Spaces are more individual-focused and are not meant
+for group collaboration.
+🌎 Personal Space
+ User dashboard
+ Manage loops, posts, services
+ Private/mergeable
+ Ideal for journaling, tracking progress, saving drafts
+🏪 Marketplace
+The Marketplace functions as a well-organized, category-driven service discovery system. Users
+and organizations can list services or events, making it easy for others to explore and connect
+through structured listings.
+ Focus: Primarily service listings, with events as a secondary type
+ Listings are categorized and neatly arranged by type, location, or purpose
+ Accessible via user profiles, community hubs, and direct navigation
+ Discovery enhanced through AI recommendations and keyword search
+ Connect via direct messages or external action links
+ No payments or reviews in V1
+🌎 Loops (Threads)
+Loops are real-time, emotion-driven or topic-triggered micro-posts that spark spontaneous
+discussions across the platform. They are designed to encourage instant engagement, raise
+problems, express moods, or start conversations that can quickly gain visibility.
+ Anyone can create a Loop when they’re bored, frustrated, inspired, or want to start a
+topic
+ Loops can be shared inside Communities and Hubs
+ All Loops are pushed to the Global > Loops feed for maximum visibility
+ AI surfaces trending or contextually relevant Loops
+ Often used for spontaneous group discussions, live debates, or public calls for help
+ Expire naturally or are de-prioritized by AI over time
+🌐 Chat System
+The Chat System in iTethr works similarly to other modern messaging platforms, but with
+powerful enhancements for both private and community contexts.
+Community/Room Chat
+ Real-time messaging with typing indicators
+ Reactions, Quote replies, Polls
+ File sharing, Image/video/media upload
+ Pinned messages for announcements
+ Integrated with Room feeds and events
+Private Chat
+ One-on-one or group direct messages
+ Long-press menu: Pin, Mute, Share, Report, Leave
+ Vedic Audio Calls for calm, intentional conversations
+ Auto-Call system (in dev): reminders via voice-triggered nudges
+🌎 Embedded Reminder Messaging
+ Smart detection of messages like: “Meeting at 10pm”
+ Automatically creates contextual reminders for users mentioned in the conversation
+ No need for manual follow-ups or notifications — the system will gently nudge
+participants
+WebSocket or Firebase integration required for real-time operations.
+❗ Notification Engine
+The Notification Engine ensures users are always aware of key actions and responses across the
+platform — from new community invites to Loop replies. It uses AI-based grouping for relevance
+and avoids overload by enabling mute settings per category.
+ Categories:
+o Community Approvals
+o Tethr Requests
+o Events & Reminders
+o Marketplace activity
+o Loop replies
+ AI grouping + mute per category
+✨ AI Assistant: Aeono
+Aeono is iTethr’s integrated AI assistant designed not just to assist, but to actively build, guide,
+and support the user’s journey across the platform. It adapts to user behavior and context to
+power discovery, networking, and productivity.
+Users can access and use multiple AI models, including most popular open-source and
+commercial options. However, Aeono is the default in-house AI model in iTethr.
+🌎 Aeono – Your Default Peer Connection Guide
+Aeono is focused on helping users:
+ Connect with like-minded peers
+ Find communities, rooms, and services faster
+ Automatically guide them through platform tasks and suggestions
+Other AI models can be used for creative work, summarization, search, idea generation, and
+more.
+Core Capabilities:
+ Universal search
+ Summarize chat
+ Suggest posts, rooms, services
+ Context-aware queries (“show me design communities in Latvia”)
+ Onboarding guidance & interest recommendations
+🌎 Roles & Permissions System (sample not fixed)
+ Member
+ Creator
+ Moderator
+ Admin
+ Owner (Community only)
+🌐 Sample User Flow
+iTethr is designed to onboard users quickly and intentionally. Unlike other platforms that
+overload users immediately after login, iTethr ensures a clean, minimal entry. Users only
+experience their private chat space (“You”) and any Community they’ve been invited to
+everything else unfolds based on engagement.
+Users can customize or build their profile gradually, allowing them to focus on connection first,
+and setup later. This phased approach ensures better user retention and deeper discovery over
+time.
+Student Flow
+ A university shares a Community link via email or portal
+ Student clicks the link → redirected to iTethr
+ Creates an account easily and completes onboarding (username, DOB, interests)
+ Lands in Home, with access to:
+o Their private self-chat space called “You”
+o The Community they joined via the invite
+Freelancer Flow
+ Builds a complete profile with professional bio, skills, and offerings
+ Requests verification to gain a Freelancer badge, increasing trust and visibility
+ Lists services in Marketplace under categorized listings
+ Uses Aeono to:
+o Find clients actively looking for those services
+o Join relevant Hubs or Communities for networking Freelancer signs up and sets
+up profile
+Community Owner flow
+ Creates a Community Plus or Hub
+ Chooses visibility: Public / Private / Request-to-join
+ Invites members manually, shares a link, or circulates a Loop to attract users into the
+community
+ Can manage onboarding, roles, Rooms, and analytics
+Document maintained by AeonovX Product Team – Version 1.0.0 Last updated:
+July 2025.
