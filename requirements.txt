@@ -4,8 +4,8 @@ huggingface-hub==0.16.4
 scikit-learn==1.3.0
 numpy==1.24.3
 
-# Groq API
-groq==0.4.1
+# Groq API - older version
+groq==0.3.0
 
 # UI Framework with compatible versions
 gradio==4.7.1
