@@ -1,4 +1,4 @@
-# iTethr Bot - Groq API Version (Railway Compatible)
+# iTethr Bot - AeonovX Team Version (Railway Compatible)
 # File: app.py
 
 import gradio as gr
@@ -16,6 +16,8 @@ import signal
 import sys
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from team_members import AEONOVX_TEAM, USER_WELCOMES
+
 
 # Load environment variables
 try:
@@ -23,6 +25,7 @@ try:
     load_dotenv()
 except ImportError:
     print("python-dotenv not available, using system environment variables")
+    
 
 # Configure logging
 logging.basicConfig(
@@ -39,8 +42,8 @@ class iTethrBot:
     """iTethr Bot - Powered by AeonovX"""
     
     def __init__(self):
-        self.version = "7.0.0"
-        self.bot_name = "iTethr Assistant"
+        self.version = "7.1.0"
+        self.bot_name = "AeonovX iTethr Assistant"
         
         # Setup Groq API
         self.groq_api_key = os.getenv('GROQ_API_KEY', '')
@@ -200,7 +203,7 @@ class iTethrBot:
                 return self._fallback_response(context, question)
             
             # Create a focused prompt for iTethr documentation
-            prompt = f"""You are the iTethr Assistant, an expert on the iTethr platform. Answer the user's question based ONLY on the provided documentation.
+            prompt = f"""You are the AeonovX iTethr Assistant, an expert on the iTethr platform. Answer the user's question based ONLY on the provided documentation.
 
 DOCUMENTATION:
 {context}
@@ -211,8 +214,9 @@ INSTRUCTIONS:
 - Answer based ONLY on the provided documentation
 - Be helpful and conversational but accurate
 - If the documentation doesn't contain the answer, say "I don't have that specific information in the iTethr documentation"
-- Keep responses focused and under 200 words
+- Keep responses focused and under 300 words
 - Be friendly and use a helpful tone
+- You are built by AeonovX team for internal use
 
 ANSWER:"""
 
@@ -226,7 +230,7 @@ ANSWER:"""
                 ],
                 model="llama3-8b-8192",  # Fast and smart Llama model
                 temperature=0.1,  # Low temperature for factual responses
-                max_tokens=200,
+                max_tokens=400,
                 top_p=0.9
             )
             
@@ -309,81 +313,135 @@ Try asking about any of these topics! 🚀"""
 # Initialize bot
 bot = iTethrBot()
 
+def authenticate(name, password):
+    """Authenticate AeonovX team members - both name and password must match"""
+    
+    if name in AEONOVX_TEAM and AEONOVX_TEAM[name]["password"] == password:
+        welcome_msg = USER_WELCOMES.get(name, f"Welcome {name}! 🚀")
+        role = AEONOVX_TEAM[name]["role"]
+        full_welcome = f"{welcome_msg}\n\n**Role:** {role}\n**Access Level:** AeonovX Team Member"
+        
+        return (
+            gr.update(visible=False),  # Hide login
+            gr.update(visible=True),   # Show bot
+            full_welcome
+        )
+    else:
+        return (
+            gr.update(visible=True),   # Keep login visible
+            gr.update(visible=False),  # Hide bot
+            "❌ Invalid AeonovX credentials. Both name and password must be correct."
+        )
+
 def create_interface():
     """Create Gradio interface"""
     
     with gr.Blocks(
-        title="iTethr Assistant - Powered by Groq",
+        title="AeonovX iTethr Assistant",
         theme=gr.themes.Soft(primary_hue="blue")
     ) as interface:
         
-        # Header
-        gr.Markdown(f"""
-        # 🚀 iTethr Assistant
-        **Accurate insights from iTethr docs — powered by AeonovX**
-        
-        *Lightning fast responses - v{bot.version}*
-        """)
-    
-        
-        chatbot = gr.Chatbot(
-            height=550,
-            label="💬 Chat with iTethr Assistant",
-            show_copy_button=True
-        )
-        
-        with gr.Row():
-            msg = gr.Textbox(
-                placeholder="Ask me anything about iTethr platform...",
-                label="",
-                scale=5,
-                max_lines=3
+        # LOGIN SCREEN
+        with gr.Column(visible=True) as login_screen:
+            gr.Markdown("""
+            # 🏢 AeonovX iTethr Assistant
+            **Internal Team Access Only - Authorized Personnel Required**
+            
+            *Secure access for AeonovX team members and authorized personnel*
+            """)
+            
+            name_input = gr.Textbox(
+                label="Full Name", 
+                placeholder="John Smith",
+                info="Enter your full name as registered in AeonovX team database"
             )
-            send = gr.Button("Send ⚡", variant="primary", scale=1)
+            password_input = gr.Textbox(
+                label="Password", 
+                type="password",
+                placeholder="Enter your team password",
+                info="Use your assigned AeonovX team password"
+            )
+            login_btn = gr.Button("🔐 Access AeonovX Assistant", variant="primary", size="lg")
+            login_status = gr.Markdown("")
         
-        # Quick suggestions
-        gr.Markdown("### 💡 Quick Questions")
-        with gr.Row():
-            btn1 = gr.Button("What is iTethr?", size="sm")
-            btn2 = gr.Button("Community structure?", size="sm")
-            btn3 = gr.Button("How to sign up?", size="sm")
+        # BOT INTERFACE
+        with gr.Column(visible=False) as bot_interface:
+            # Header with team branding
+            gr.Markdown(f"""
+            # 🚀 AeonovX iTethr Assistant
+            **Internal Knowledge Base - Powered by AeonovX Intelligence**
+            
+            *Lightning fast responses - v{bot.version} | Team Edition*
+            """)
+            
+            chatbot = gr.Chatbot(
+                height=550,
+                label="💬 Chat with AeonovX iTethr Assistant",
+                show_copy_button=True,
+                avatar_images=("👤", "🤖")
+            )
+            
+            with gr.Row():
+                msg = gr.Textbox(
+                    placeholder="Ask me about iTethr platform, projects, or team resources...",
+                    label="",
+                    scale=5,
+                    max_lines=3
+                )
+                send = gr.Button("Send ⚡", variant="primary", scale=1)
+            
+            # Quick suggestions
+            gr.Markdown("### 💡 Quick Team Questions")
+            with gr.Row():
+                btn1 = gr.Button("What is iTethr?", size="sm")
+                btn2 = gr.Button("Community structure?", size="sm")
+                btn3 = gr.Button("Authentication process?", size="sm")
+            
+            with gr.Row():
+                btn4 = gr.Button("Bubble interface design?", size="sm")
+                btn5 = gr.Button("Aeono AI features?", size="sm")
+                btn6 = gr.Button("iFeed functionality?", size="sm")
+            
+            gr.Markdown("""
+            ### ⚡ Powered by AeonovX Intelligence
+            
+            **Team Features:**
+            • **Ultra-fast responses** – Groq-powered AI inference ⚡
+            • **Smart understanding** – Advanced Llama models for precise answers
+            • **Semantic search** – Finds relevant info with natural language
+            • **Always current** – Based on latest iTethr documentation
+            • **Team-optimized** – Built specifically for AeonovX workflow
+            • **Secure access** – Protected team-only environment 🔒
+                        
+            **Available 24/7 for the AeonovX team** - Your AI-powered knowledge companion.
+            """)
+            
+            def safe_chat(message, history):
+                try:
+                    return bot.chat(message, history)
+                except Exception as e:
+                    logger.error(f"Chat error: {e}")
+                    if message.strip():
+                        history.append((message, f"Sorry, I encountered an error: {str(e)}"))
+                    return "", history
+            
+            # Connect events
+            send.click(safe_chat, [msg, chatbot], [msg, chatbot])
+            msg.submit(safe_chat, [msg, chatbot], [msg, chatbot])
+            
+            btn1.click(lambda: "What is iTethr platform?", outputs=msg)
+            btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
+            btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
+            btn4.click(lambda: "What is the bubble interface?", outputs=msg)
+            btn5.click(lambda: "Tell me about Aeono AI assistant", outputs=msg)
+            btn6.click(lambda: "What is iTethr iFeed?", outputs=msg)
         
-        with gr.Row():
-            btn4 = gr.Button("Bubble interface?", size="sm")
-            btn5 = gr.Button("What is Aeono AI?", size="sm")
-            btn6 = gr.Button("iTethr iFeed features?", size="sm")
-        
-        gr.Markdown("""
-        ### ⚡ Powered by AeonovX
-        
-        **Features:**
-        • **Ultra-fast responses** – Groq's lightning-speed inference ⚡
-        • **Smart understanding** – Advanced Llama models for accurate answers
-        • **Semantic search** – Finds relevant info even with different wording
-        • **Always up-to-date** – Based on official iTethr documentation
-        • **Community-driven** – Built for iTethr community needs
-                    
-        """)
-        
-        def safe_chat(message, history):
-            try:
-                return bot.chat(message, history)
-            except Exception as e:
-                logger.error(f"Chat error: {e}")
-                if message.strip():
-                    history.append((message, f"Sorry, I encountered an error: {str(e)}"))
-                return "", history
-        
-        # Connect events
-        send.click(safe_chat, [msg, chatbot], [msg, chatbot])
-        msg.submit(safe_chat, [msg, chatbot], [msg, chatbot])
-        
-        btn1.click(lambda: "What is iTethr platform?", outputs=msg)
-        btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
-        btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
-        btn4.click(lambda: "What is the bubble interface?", outputs=msg)
-        btn5.click(lambda: "Tell me about Aeono AI assistant", outputs=msg)
-        btn6.click(lambda: "What is iTethr iFeed?", outputs=msg)
+        # Connect login with both inputs
+        login_btn.click(
+            authenticate,
+            [name_input, password_input],
+            [login_screen, bot_interface, login_status]
+        )
     
     # Health check
     @interface.app.get("/health")
@@ -392,10 +450,11 @@ def create_interface():
         return JSONResponse(content={
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
-            "service": "itethr-bot-groq",
+            "service": "aeonovx-itethr-assistant",
             "version": bot.version,
             "documents_loaded": len(bot.documents),
-            "groq_api_configured": bool(bot.groq_api_key)
+            "groq_api_configured": bool(bot.groq_api_key),
+            "team_members_active": len(AEONOVX_TEAM)
         }, status_code=200)
     
     return interface
@@ -408,7 +467,7 @@ def setup_railway_config():
 
 # Graceful shutdown
 def signal_handler(sig, frame):
-    logger.info('🛑 Shutting down...')
+    logger.info('🛑 Shutting down AeonovX Assistant...')
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -417,6 +476,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 if __name__ == "__main__":
     try:
         logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
+        logger.info(f"👥 Team members configured: {len(AEONOVX_TEAM)}")
         
         interface = create_interface()
         port = setup_railway_config()
