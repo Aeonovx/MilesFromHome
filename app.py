@@ -48,13 +48,6 @@ class OptimizediTethrBot:
         self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))
         self.temperature = float(os.getenv('TEMPERATURE', '0.01'))
         
-        # Health status
-        self.health_status = {
-            "bot": "initializing",
-            "database": "initializing",
-            "model": "initializing"
-        }
-        
         # Setup bot
         self._setup_components()
         logger.info(f"🚀 {self.bot_name} v{self.version} optimized and ready!")
@@ -69,39 +62,18 @@ class OptimizediTethrBot:
             # Setup database
             self.client = chromadb.PersistentClient(path='./knowledge_base')
             self.collection = self.client.get_or_create_collection(name="docs")
-            self.health_status["database"] = "healthy"
             
             # Load documents
             self._load_all_documents()
             
-            # Test model availability
-            self._test_model()
-            
             # Stats
             self.total_questions = 0
-            self.health_status["bot"] = "healthy"
             
             logger.info("✅ All components optimized and ready!")
             
         except Exception as e:
             logger.error(f"Setup failed: {e}")
-            self.health_status["bot"] = "unhealthy"
             raise
-    
-    def _test_model(self):
-        """Test if Ollama model is available"""
-        try:
-            logger.info(f"Testing model: {self.model_name}")
-            result = ollama.generate(
-                model=self.model_name,
-                prompt="Test",
-                options={'max_tokens': 10}
-            )
-            self.health_status["model"] = "healthy"
-            logger.info("✅ Model test successful")
-        except Exception as e:
-            logger.error(f"Model test failed: {e}")
-            self.health_status["model"] = "unhealthy"
     
     def _load_all_documents(self):
         """Load all documents from documents folder"""
@@ -303,33 +275,6 @@ ANSWER:"""
             response = self.get_response(message)
             history.append((message, response))
         return "", history
-    
-    def get_health_status(self):
-        """Get current health status"""
-        overall_status = "healthy"
-        
-        # Check database
-        try:
-            self.collection.count()
-            self.health_status["database"] = "healthy"
-        except Exception:
-            self.health_status["database"] = "unhealthy"
-            overall_status = "degraded"
-        
-        # Check bot response
-        try:
-            self.get_response("test")
-            self.health_status["bot"] = "healthy"
-        except Exception:
-            self.health_status["bot"] = "unhealthy"
-            overall_status = "degraded"
-        
-        return {
-            "status": overall_status,
-            "timestamp": datetime.utcnow().isoformat(),
-            "version": self.version,
-            "components": self.health_status
-        }
 
 # Initialize optimized bot
 bot = OptimizediTethrBot()
@@ -453,14 +398,16 @@ def create_interface():
             [login_screen, bot_interface, login_status]
         )
     
-    # Add health check endpoint to Gradio's FastAPI app
+    # Add simple health check endpoint that always responds immediately
     @interface.app.get("/health")
     async def health_check():
-        health_data = bot.get_health_status()
-        status_code = 200 if health_data["status"] == "healthy" else 503
-        
         from fastapi.responses import JSONResponse
-        return JSONResponse(content=health_data, status_code=status_code)
+        return JSONResponse(content={
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "service": "itethr-bot",
+            "version": bot.version
+        }, status_code=200)
     
     return interface
 
