@@ -1,19 +1,17 @@
-# Optimized Fast & Accurate iTethr Bot - Railway Fixed
+# iTethr Bot - Using Hugging Face Transformers (Railway Compatible)
 # File: app.py
 
 import gradio as gr
 import os
 import chromadb
 from sentence_transformers import SentenceTransformer
-import ollama
+from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 import json
 import yaml
-import threading
 import time
 import logging
 from datetime import datetime
 from typing import List, Tuple, Optional
-import uuid
 import hashlib
 import signal
 import sys
@@ -36,26 +34,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class OptimizediTethrBot:
-    """Optimized iTethr Bot - Fast, Accurate, No Hallucination"""
+class iTethrBot:
+    """iTethr Bot - Using Hugging Face Transformers"""
     
     def __init__(self):
-        self.version = "6.0.0"
+        self.version = "6.1.0"
         self.bot_name = "iTethr Assistant"
         
-        # Optimized AI settings for speed and accuracy
-        self.model_name = os.getenv('AI_MODEL', 'qwen2.5:1.5b')
+        # AI settings
         self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))
-        self.temperature = float(os.getenv('TEMPERATURE', '0.01'))
+        self.temperature = float(os.getenv('TEMPERATURE', '0.1'))
         
         # Setup bot
         self._setup_components()
-        logger.info(f"🚀 {self.bot_name} v{self.version} optimized and ready!")
+        logger.info(f"🚀 {self.bot_name} v{self.version} ready!")
     
     def _setup_components(self):
         """Setup bot components"""
         try:
-            # Load embeddings
+            # Load embeddings (lightweight)
             logger.info("Loading embeddings model...")
             self.embeddings = SentenceTransformer('all-MiniLM-L6-v2')
             
@@ -66,14 +63,38 @@ class OptimizediTethrBot:
             # Load documents
             self._load_all_documents()
             
-            # Stats
-            self.total_questions = 0
+            # Setup AI model (lightweight)
+            logger.info("Loading AI model...")
+            self._setup_ai_model()
             
-            logger.info("✅ All components optimized and ready!")
+            self.total_questions = 0
+            logger.info("✅ All components ready!")
             
         except Exception as e:
             logger.error(f"Setup failed: {e}")
             raise
+    
+    def _setup_ai_model(self):
+        """Setup lightweight AI model"""
+        try:
+            # Use a small, fast model that works well on CPU
+            model_name = "microsoft/DialoGPT-small"
+            
+            logger.info(f"Loading {model_name}...")
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.model = AutoModelForCausalLM.from_pretrained(model_name)
+            
+            # Add padding token if it doesn't exist
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+            
+            logger.info("✅ AI model loaded successfully")
+            
+        except Exception as e:
+            logger.error(f"AI model setup failed: {e}")
+            # Fallback to no AI
+            self.model = None
+            self.tokenizer = None
     
     def _load_all_documents(self):
         """Load all documents from documents folder"""
@@ -166,7 +187,7 @@ class OptimizediTethrBot:
         return chunks if chunks else [content]
     
     def _search_knowledge(self, question: str) -> List[str]:
-        """Optimized search with strict relevance"""
+        """Search knowledge base"""
         try:
             question_embedding = self.embeddings.encode(question.lower()).tolist()
             
@@ -193,15 +214,73 @@ class OptimizediTethrBot:
             logger.error(f"Search error: {e}")
             return []
     
+    def _generate_response(self, context: str, question: str) -> str:
+        """Generate AI response using Hugging Face model"""
+        try:
+            if not self.model or not self.tokenizer:
+                return self._fallback_response(context, question)
+            
+            # Create a simple prompt
+            prompt = f"Based on this documentation about iTethr:\n\n{context[:500]}\n\nQuestion: {question}\nAnswer:"
+            
+            # Tokenize
+            inputs = self.tokenizer.encode(prompt, return_tensors='pt', truncate=True, max_length=512)
+            
+            # Generate response
+            with torch.no_grad():
+                outputs = self.model.generate(
+                    inputs,
+                    max_length=inputs.shape[1] + 100,
+                    temperature=self.temperature,
+                    do_sample=True,
+                    pad_token_id=self.tokenizer.eos_token_id
+                )
+            
+            # Decode response
+            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            
+            # Extract only the generated part
+            if "Answer:" in response:
+                response = response.split("Answer:")[-1].strip()
+            
+            return response[:300] if response else self._fallback_response(context, question)
+            
+        except Exception as e:
+            logger.error(f"AI generation error: {e}")
+            return self._fallback_response(context, question)
+    
+    def _fallback_response(self, context: str, question: str) -> str:
+        """Fallback response when AI fails"""
+        # Simple keyword matching fallback
+        question_lower = question.lower()
+        context_lower = context.lower()
+        
+        if "community" in question_lower or "hub" in question_lower:
+            return "iTethr has a hierarchical community structure with Communities, Hubs, and Rooms. Communities can contain multiple Hubs, and Hubs contain Rooms for specific discussions."
+        elif "authentication" in question_lower or "sign up" in question_lower:
+            return "iTethr supports multiple sign-up methods: Google OAuth, Apple OAuth, and traditional email/password registration with a simplified 3-step onboarding process."
+        elif "bubble" in question_lower or "interface" in question_lower:
+            return "iTethr uses a revolutionary bubble-based interface instead of traditional navigation bars. Users interact with floating animated bubbles representing Communities, Loops, and contacts."
+        elif "aeono" in question_lower or "ai" in question_lower:
+            return "Aeono is iTethr's integrated AI assistant designed to help users connect with peers, find communities, and navigate the platform efficiently."
+        else:
+            # Return relevant snippet from context
+            sentences = context.split('. ')
+            for sentence in sentences[:3]:
+                if any(word in sentence.lower() for word in question_lower.split()):
+                    return sentence.strip() + "."
+            
+            return "Based on the iTethr documentation, I can help you with platform features, communities, authentication, and AI assistance."
+    
     def get_response(self, message: str) -> str:
-        """Optimized response generation - Fast & Accurate"""
+        """Get response from bot"""
         start_time = time.time()
         self.total_questions += 1
         
         if not message.strip():
             return "Hi! Ask me anything about iTethr platform. I'll give you accurate answers based on the documentation."
         
-        # Quick search
+        # Search knowledge base
         relevant_docs = self._search_knowledge(message)
         
         if not relevant_docs:
@@ -215,97 +294,57 @@ That info's either top secret, lost in the Matrix, or my hamster-powered memory 
 • User authentication and sign-up processes 
 • Community structure (Communities, Hubs, Rooms) 
 • Bubble-based interface design
-• I assistant capabilities (Aeono)  
+• AI assistant capabilities (Aeono)  
 • Technical implementation details
 • iTethr iFeed functionality
 
 Try asking about any of these — I'll respond faster than your group chat drama. 📲🔥"""
 
-        # Use only the most relevant document for speed and accuracy
+        # Use the most relevant document
         context = relevant_docs[0]
         
-        # Strict prompt to prevent hallucination
-        prompt = f"""You are iTethr Assistant. Answer ONLY using the exact information from the documentation below.
-
-DOCUMENTATION:
-{context}
-
-QUESTION: {message}
-
-STRICT RULES:
-- Use ONLY information directly stated in the documentation above
-- Do not add any details not mentioned in the docs
-- Do not make assumptions or expand beyond what's written
-- If the documentation doesn't contain the answer, say "The documentation doesn't provide that specific information"
-- Be direct and factual
-
-ANSWER:"""
+        # Generate response
+        response = self._generate_response(context, message)
+        response += f"\n\n*Based on iTethr documentation*"
         
-        try:
-            # Optimized generation parameters
-            result = ollama.generate(
-                model=self.model_name,
-                prompt=prompt,
-                options={
-                    'temperature': 0.01,
-                    'max_tokens': 200,
-                    'num_predict': 200,
-                    'top_p': 0.1,
-                    'repeat_penalty': 1.0,
-                    'num_ctx': 1024
-                }
-            )
-            
-            response = result['response'].strip()
-            response += f"\n\n*Based on iTethr documentation*"
-            
-            # Log response time
-            response_time = time.time() - start_time
-            logger.info(f"⚡ Response generated in {response_time:.2f}s")
-            
-            return response
-            
-        except Exception as e:
-            logger.error(f"AI generation error: {e}")
-            return f"I'm experiencing technical difficulties. Please try again.\n\nError: {str(e)}"
+        # Log response time
+        response_time = time.time() - start_time
+        logger.info(f"⚡ Response generated in {response_time:.2f}s")
+        
+        return response
     
     def chat(self, message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[str, str]]]:
-        """Optimized chat function"""
+        """Chat function for Gradio"""
         if message.strip():
             response = self.get_response(message)
             history.append((message, response))
         return "", history
 
-# Initialize optimized bot
-bot = OptimizediTethrBot()
+# Initialize bot
+bot = iTethrBot()
 
 def create_interface():
-    """Create the Gradio interface with health check"""
+    """Create Gradio interface"""
     
-    # Get team password from environment
-    TEAM_PASSWORD = os.getenv('BOT_ACCESS_PASSWORD', 'itethr2024')
+    TEAM_PASSWORD = os.getenv('BOT_ACCESS_PASSWORD', 'ADMIN')
     
     def authenticate(password):
-        """Check if password is correct"""
         if password.strip() == TEAM_PASSWORD:
             return (
-                gr.update(visible=False),  # Hide login screen
-                gr.update(visible=True),   # Show bot interface
+                gr.update(visible=False),
+                gr.update(visible=True),
                 ""
             )
         else:
             return (
-                gr.update(visible=True),   # Keep login screen
-                gr.update(visible=False),  # Hide bot interface  
+                gr.update(visible=True),
+                gr.update(visible=False),
                 "❌ Incorrect password. Please try again."
             )
     
     with gr.Blocks(
-        title="iTethr Assistant - Optimized",
-        theme=gr.themes.Soft(
-            primary_hue="blue",
-            secondary_hue="blue"
-        )
+        title="iTethr Assistant",
+        theme=gr.themes.Soft(primary_hue="blue")
     ) as interface:
         
         # LOGIN SCREEN
@@ -319,57 +358,34 @@ def create_interface():
         with gr.Column(visible=False) as bot_interface:
             gr.Markdown(f"""
             # 🤖 iTethr Assistant
-            **Accurate, on-demand insights from iTethr docs — powered by AeonovX**
+            **Accurate insights from iTethr docs — powered by Hugging Face**
             
-            *Optimized for speed and accuracy - v{bot.version}*
+            *Fast and reliable - v{bot.version}*
             """)
             
-            # Main chat interface
+            chatbot = gr.Chatbot(
+                height=550,
+                label="💬 Chat with iTethr Assistant",
+                show_copy_button=True,
+                placeholder="Ask me anything about iTethr platform..."
+            )
+            
             with gr.Row():
-                with gr.Column():
-                    chatbot = gr.Chatbot(
-                        height=550,
-                        label="💬 Chat with iTethr Assistant",
-                        show_copy_button=True,
-                        placeholder="Ask me anything about iTethr platform..."
-                    )
-                    
-                    with gr.Row():
-                        msg = gr.Textbox(
-                            placeholder="Type your question about iTethr...",
-                            label="",
-                            scale=5,
-                            max_lines=3
-                        )
-                        send = gr.Button("Send ⚡", variant="primary", scale=1)
+                msg = gr.Textbox(
+                    placeholder="Type your question about iTethr...",
+                    label="",
+                    scale=5,
+                    max_lines=3
+                )
+                send = gr.Button("Send ⚡", variant="primary", scale=1)
             
             # Quick suggestions
-            gr.Markdown("### 💡 Quick Questions (Click to Ask)")
+            gr.Markdown("### 💡 Quick Questions")
             with gr.Row():
-                btn1 = gr.Button("What is iTethr platform?", size="sm", variant="secondary")
-                btn2 = gr.Button("How does authentication work?", size="sm", variant="secondary")
-                btn3 = gr.Button("Explain Communities and Hubs", size="sm", variant="secondary")
+                btn1 = gr.Button("What is iTethr?", size="sm")
+                btn2 = gr.Button("Community structure?", size="sm")
+                btn3 = gr.Button("How to sign up?", size="sm")
             
-            with gr.Row():
-                btn4 = gr.Button("What is the bubble interface?", size="sm", variant="secondary")
-                btn5 = gr.Button("Tell me about Aeono AI", size="sm", variant="secondary")
-                btn6 = gr.Button("What is iTethr iFeed?", size="sm", variant="secondary")
-            
-            gr.Markdown("""
-            ### ⚡ Built for Speed, Trained for Truth
-            
-            **Features:**
-            • **Blazing-fast replies** – Like, caffeine-injected fast ☕⚡
-            • **Seriously accurate** – No guesswork, no hallucinations, just facts
-            • **One-click copy** – Hit that copy button and boom, info's yours  
-            
-            **Tips:**
-            • Be specific – Vague questions confuse my circuits 🌀 
-            • Add "explain" for deep dives and nerd-level clarity  
-            • I only spill knowledge from official iTethr docs (no gossip here 😇)
-            """)
-            
-            # Connect events with error handling
             def safe_chat(message, history):
                 try:
                     return bot.chat(message, history)
@@ -379,17 +395,13 @@ def create_interface():
                         history.append((message, f"Sorry, I encountered an error: {str(e)}"))
                     return "", history
             
-            # Event connections
+            # Connect events
             send.click(safe_chat, [msg, chatbot], [msg, chatbot])
             msg.submit(safe_chat, [msg, chatbot], [msg, chatbot])
             
-            # Connect suggestion buttons
             btn1.click(lambda: "What is iTethr platform?", outputs=msg)
-            btn2.click(lambda: "How does authentication work?", outputs=msg)
-            btn3.click(lambda: "Explain Communities and Hubs", outputs=msg)
-            btn4.click(lambda: "What is the bubble interface?", outputs=msg)
-            btn5.click(lambda: "Tell me about Aeono AI", outputs=msg)
-            btn6.click(lambda: "What is iTethr iFeed?", outputs=msg)
+            btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
+            btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
         
         # Connect login
         login_btn.click(
@@ -398,7 +410,7 @@ def create_interface():
             [login_screen, bot_interface, login_status]
         )
     
-    # Add simple health check endpoint that always responds immediately
+    # Health check
     @interface.app.get("/health")
     async def health_check():
         from fastapi.responses import JSONResponse
@@ -412,43 +424,26 @@ def create_interface():
     return interface
 
 def setup_railway_config():
-    """Configure app for Railway deployment"""
-    if os.getenv('RAILWAY_ENVIRONMENT') == 'production':
-        logger.info("🚂 Railway deployment detected")
-        
-        # Railway-specific settings
-        os.environ['GRADIO_SHARE'] = 'false'
-        os.environ['DEBUG'] = 'false'
-        
-        # Get Railway port
-        port = os.getenv('PORT', '7860')
-        railway_url = os.getenv('RAILWAY_STATIC_URL', 'localhost')
-        
-        logger.info(f"🌐 Railway URL: {railway_url}")
-        logger.info(f"🔌 Railway Port: {port}")
-        
-        return int(port)
-    
-    return int(os.getenv('PORT', '7860'))
+    """Configure for Railway"""
+    port = int(os.getenv('PORT', '7860'))
+    logger.info(f"🔌 Using port: {port}")
+    return port
 
-# Graceful shutdown handler
+# Graceful shutdown
 def signal_handler(sig, frame):
-    logger.info('🛑 Graceful shutdown initiated...')
+    logger.info('🛑 Shutting down...')
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
-# Main runner
 if __name__ == "__main__":
     try:
         logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
-        logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens}")
         
         interface = create_interface()
         port = setup_railway_config()
 
-        # Enhanced launch configuration for Railway
         interface.launch(
             server_name="0.0.0.0",
             server_port=port,
@@ -459,5 +454,5 @@ if __name__ == "__main__":
             quiet=os.getenv('RAILWAY_ENVIRONMENT') == 'production'
         )
     except Exception as e:
-        logger.error(f"Failed to start application: {e}")
+        logger.error(f"Failed to start: {e}")
         sys.exit(1)
