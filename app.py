@@ -1,10 +1,10 @@
-# iTethr Bot - ChromaDB Free Version (Railway Compatible)
+# iTethr Bot - Groq API Version (Railway Compatible)
 # File: app.py
 
 import gradio as gr
 import os
 from sentence_transformers import SentenceTransformer
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
+from groq import Groq
 import json
 import yaml
 import time
@@ -36,15 +36,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class iTethrBot:
-    """iTethr Bot - Smart Search without ChromaDB"""
+    """iTethr Bot - Powered by Groq API"""
     
     def __init__(self):
-        self.version = "6.2.0"
+        self.version = "7.0.0"
         self.bot_name = "iTethr Assistant"
         
-        # AI settings
-        self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))
-        self.temperature = float(os.getenv('TEMPERATURE', '0.1'))
+        # Setup Groq API
+        self.groq_api_key = os.getenv('GROQ_API_KEY', '')
+        if not self.groq_api_key:
+            logger.warning("⚠️ GROQ_API_KEY not found. Add it to your Railway environment variables.")
+            logger.info("Get your free API key from: https://console.groq.com/keys")
+        
+        self.groq_client = Groq(api_key=self.groq_api_key) if self.groq_api_key else None
         
         # In-memory storage for embeddings
         self.documents = []  # Store document chunks
@@ -65,38 +69,12 @@ class iTethrBot:
             # Load documents and create embeddings
             self._load_all_documents()
             
-            # Setup AI model (lightweight)
-            logger.info("Loading AI model...")
-            self._setup_ai_model()
-            
             self.total_questions = 0
             logger.info("✅ All components ready!")
             
         except Exception as e:
             logger.error(f"Setup failed: {e}")
             raise
-    
-    def _setup_ai_model(self):
-        """Setup lightweight AI model"""
-        try:
-            # Use a small, fast model that works well on CPU
-            model_name = "microsoft/DialoGPT-small"
-            
-            logger.info(f"Loading {model_name}...")
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.model = AutoModelForCausalLM.from_pretrained(model_name)
-            
-            # Add padding token if it doesn't exist
-            if self.tokenizer.pad_token is None:
-                self.tokenizer.pad_token = self.tokenizer.eos_token
-            
-            logger.info("✅ AI model loaded successfully")
-            
-        except Exception as e:
-            logger.error(f"AI model setup failed: {e}")
-            # Fallback to no AI
-            self.model = None
-            self.tokenizer = None
     
     def _load_all_documents(self):
         """Load all documents and create embeddings in memory"""
@@ -173,8 +151,8 @@ class iTethrBot:
     
     def _create_chunks(self, content: str, filename: str) -> List[str]:
         """Create optimized text chunks"""
-        chunk_size = 250
-        overlap = 30
+        chunk_size = 300  # Slightly larger for better context
+        overlap = 50
         
         words = content.split()
         chunks = []
@@ -199,13 +177,13 @@ class iTethrBot:
             # Calculate cosine similarity with all document embeddings
             similarities = cosine_similarity(question_embedding, self.embeddings)[0]
             
-            # Get top 2 most similar documents
-            top_indices = np.argsort(similarities)[-2:][::-1]  # Top 2, highest first
+            # Get top 3 most similar documents (increased for better context)
+            top_indices = np.argsort(similarities)[-3:][::-1]  # Top 3, highest first
             
             relevant_docs = []
             for idx in top_indices:
                 similarity = similarities[idx]
-                if similarity > 0.3:  # Threshold for relevance
+                if similarity > 0.25:  # Lowered threshold for more results
                     relevant_docs.append(self.documents[idx])
                     logger.info(f"Found relevant content (similarity: {similarity:.3f}) from {self.metadata[idx]['filename']}")
             
@@ -215,47 +193,54 @@ class iTethrBot:
             logger.error(f"Search error: {e}")
             return []
     
-    def _generate_response(self, context: str, question: str) -> str:
-        """Generate AI response using Hugging Face model"""
+    def _generate_groq_response(self, context: str, question: str) -> str:
+        """Generate AI response using Groq API"""
         try:
-            if not self.model or not self.tokenizer:
+            if not self.groq_client:
                 return self._fallback_response(context, question)
             
-            # Create a simple prompt
-            prompt = f"Based on this iTethr documentation:\n\n{context[:500]}\n\nQuestion: {question}\nAnswer:"
+            # Create a focused prompt for iTethr documentation
+            prompt = f"""You are the iTethr Assistant, an expert on the iTethr platform. Answer the user's question based ONLY on the provided documentation.
+
+DOCUMENTATION:
+{context}
+
+USER QUESTION: {question}
+
+INSTRUCTIONS:
+- Answer based ONLY on the provided documentation
+- Be helpful and conversational but accurate
+- If the documentation doesn't contain the answer, say "I don't have that specific information in the iTethr documentation"
+- Keep responses focused and under 200 words
+- Be friendly and use a helpful tone
+
+ANSWER:"""
+
+            # Use Groq API with fast Llama model
+            chat_completion = self.groq_client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                model="llama3-8b-8192",  # Fast and smart Llama model
+                temperature=0.1,  # Low temperature for factual responses
+                max_tokens=200,
+                top_p=0.9
+            )
             
-            # Tokenize
-            inputs = self.tokenizer.encode(prompt, return_tensors='pt', truncate=True, max_length=512)
-            
-            # Generate response
-            import torch
-            with torch.no_grad():
-                outputs = self.model.generate(
-                    inputs,
-                    max_length=inputs.shape[1] + 100,
-                    temperature=self.temperature,
-                    do_sample=True,
-                    pad_token_id=self.tokenizer.eos_token_id
-                )
-            
-            # Decode response
-            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
-            # Extract only the generated part
-            if "Answer:" in response:
-                response = response.split("Answer:")[-1].strip()
-            
-            return response[:300] if response else self._fallback_response(context, question)
+            response = chat_completion.choices[0].message.content.strip()
+            return response if response else self._fallback_response(context, question)
             
         except Exception as e:
-            logger.error(f"AI generation error: {e}")
+            logger.error(f"Groq API error: {e}")
             return self._fallback_response(context, question)
     
     def _fallback_response(self, context: str, question: str) -> str:
-        """Fallback response when AI fails"""
+        """Fallback response when Groq API fails"""
         # Simple keyword matching fallback
         question_lower = question.lower()
-        context_lower = context.lower()
         
         if "community" in question_lower or "hub" in question_lower:
             return "iTethr has a hierarchical community structure with Communities, Hubs, and Rooms. Communities can contain multiple Hubs, and Hubs contain Rooms for specific discussions."
@@ -265,6 +250,8 @@ class iTethrBot:
             return "iTethr uses a revolutionary bubble-based interface instead of traditional navigation bars. Users interact with floating animated bubbles representing Communities, Loops, and contacts."
         elif "aeono" in question_lower or "ai" in question_lower:
             return "Aeono is iTethr's integrated AI assistant designed to help users connect with peers, find communities, and navigate the platform efficiently."
+        elif "ifeed" in question_lower or "feed" in question_lower:
+            return "iTethr iFeed is the global content stream where public posts, announcements, and Loop discussions are surfaced, functioning like a fusion of Reddit and Twitter."
         else:
             # Return relevant snippet from context
             sentences = context.split('. ')
@@ -272,7 +259,7 @@ class iTethrBot:
                 if any(word in sentence.lower() for word in question_lower.split()):
                     return sentence.strip() + "."
             
-            return "Based on the iTethr documentation, I can help you with platform features, communities, authentication, and AI assistance."
+            return "I can help you with iTethr platform features, communities, authentication, and more. Try asking about specific topics like 'What is iTethr?' or 'How do communities work?'"
     
     def get_response(self, message: str) -> str:
         """Get response from bot"""
@@ -286,27 +273,24 @@ class iTethrBot:
         relevant_docs = self._search_knowledge(message)
         
         if not relevant_docs:
-            return """🧠 Uh-oh... my digital brain just blanked on that one!
+            return """🧠 Hmm, I couldn't find specific information about that in the iTethr documentation!
 
-That info's either top secret, lost in the Matrix, or my hamster-powered memory ran out of juice. 🐹⚡
+**Here's what I can definitely help you with:**
 
-**BUT here's what I *do* know without glitching:**
+• **iTethr platform overview** - What is iTethr and how it works
+• **Community structure** - Communities, Hubs, and Rooms explained  
+• **User authentication** - Sign-up processes and account management
+• **Bubble interface** - The unique UI design and navigation
+• **Aeono AI assistant** - Built-in AI features and capabilities
+• **iFeed functionality** - Global content streams and social features
 
-• iTethr platform overview and features  
-• User authentication and sign-up processes 
-• Community structure (Communities, Hubs, Rooms) 
-• Bubble-based interface design
-• AI assistant capabilities (Aeono)  
-• Technical implementation details
-• iTethr iFeed functionality
+Try asking about any of these topics! 🚀"""
 
-Try asking about any of these — I'll respond faster than your group chat drama. 📲🔥"""
-
-        # Use the most relevant document
-        context = relevant_docs[0]
+        # Combine multiple relevant documents for better context
+        context = "\n\n".join(relevant_docs[:2])  # Use top 2 results
         
-        # Generate response
-        response = self._generate_response(context, message)
+        # Generate response using Groq API
+        response = self._generate_groq_response(context, message)
         response += f"\n\n*Based on iTethr documentation*"
         
         # Log response time
@@ -329,17 +313,29 @@ def create_interface():
     """Create Gradio interface"""
     
     with gr.Blocks(
-        title="iTethr Assistant",
+        title="iTethr Assistant - Powered by Groq",
         theme=gr.themes.Soft(primary_hue="blue")
     ) as interface:
         
-        # Skip login - go straight to bot
+        # Header
         gr.Markdown(f"""
-        # 🤖 iTethr Assistant
-        **Accurate insights from iTethr docs — powered by Semantic Search**
+        # 🚀 iTethr Assistant
+        **Accurate insights from iTethr docs — powered by Groq AI**
         
-        *Fast and reliable - v{bot.version}*
+        *Lightning fast responses - v{bot.version}*
         """)
+        
+        # API Key status
+        if not bot.groq_api_key:
+            gr.Markdown("""
+            ⚠️ **GROQ_API_KEY not configured**
+            
+            Add your free Groq API key to Railway environment variables:
+            1. Get key from: https://console.groq.com/keys
+            2. Add to Railway: Settings → Variables → GROQ_API_KEY
+            
+            *Bot will use fallback responses until API key is added.*
+            """)
         
         chatbot = gr.Chatbot(
             height=550,
@@ -349,7 +345,7 @@ def create_interface():
         
         with gr.Row():
             msg = gr.Textbox(
-                placeholder="Type your question about iTethr...",
+                placeholder="Ask me anything about iTethr platform...",
                 label="",
                 scale=5,
                 max_lines=3
@@ -362,6 +358,23 @@ def create_interface():
             btn1 = gr.Button("What is iTethr?", size="sm")
             btn2 = gr.Button("Community structure?", size="sm")
             btn3 = gr.Button("How to sign up?", size="sm")
+        
+        with gr.Row():
+            btn4 = gr.Button("Bubble interface?", size="sm")
+            btn5 = gr.Button("What is Aeono AI?", size="sm")
+            btn6 = gr.Button("iTethr iFeed features?", size="sm")
+        
+        gr.Markdown("""
+        ### ⚡ Powered by Groq AI
+        
+        **Features:**
+        • **Ultra-fast responses** – Groq's lightning-speed inference ⚡
+        • **Smart understanding** – Advanced Llama models for accurate answers
+        • **Semantic search** – Finds relevant info even with different wording
+        • **Always up-to-date** – Based on official iTethr documentation
+        
+        **Free tier:** 6,000 requests per day - perfect for team use!
+        """)
         
         def safe_chat(message, history):
             try:
@@ -379,6 +392,9 @@ def create_interface():
         btn1.click(lambda: "What is iTethr platform?", outputs=msg)
         btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
         btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
+        btn4.click(lambda: "What is the bubble interface?", outputs=msg)
+        btn5.click(lambda: "Tell me about Aeono AI assistant", outputs=msg)
+        btn6.click(lambda: "What is iTethr iFeed?", outputs=msg)
     
     # Health check
     @interface.app.get("/health")
@@ -387,9 +403,10 @@ def create_interface():
         return JSONResponse(content={
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
-            "service": "itethr-bot",
+            "service": "itethr-bot-groq",
             "version": bot.version,
-            "documents_loaded": len(bot.documents)
+            "documents_loaded": len(bot.documents),
+            "groq_api_configured": bool(bot.groq_api_key)
         }, status_code=200)
     
     return interface
