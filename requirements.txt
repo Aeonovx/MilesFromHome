@@ -1,30 +1,14 @@
-# Core Web Framework
-Flask==2.0.0
-Werkzeug==2.0.0
-gunicorn==21.2.0
-
 # AI and ML Libraries
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.1.0
 transformers==4.35.0
 sentence-transformers==2.2.2
-chromadb==0.3.29
+scikit-learn==1.3.0
 
 # UI Framework
 gradio==4.7.1
 
-# Compatible versions for chromadb 0.3.29
-pydantic==1.10.12
-fastapi==0.68.0
-starlette==0.14.2
-
 # Utilities
-requests==2.31.0
 python-dotenv==1.0.0
 PyYAML==6.0.1
 numpy==1.24.3
-tqdm==4.66.1
-
-# API and Integration
-flask-cors==4.0.0
-aiohttp==3.8.5

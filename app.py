@@ -1,10 +1,8 @@
-# iTethr Bot - Using Hugging Face Transformers (Railway Compatible)
+# iTethr Bot - ChromaDB Free Version (Railway Compatible)
 # File: app.py
 
 import gradio as gr
 import os
-import torch
-import chromadb
 from sentence_transformers import SentenceTransformer
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 import json
@@ -16,6 +14,8 @@ from typing import List, Tuple, Optional
 import hashlib
 import signal
 import sys
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Load environment variables
 try:
@@ -36,15 +36,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class iTethrBot:
-    """iTethr Bot - Using Hugging Face Transformers"""
+    """iTethr Bot - Smart Search without ChromaDB"""
     
     def __init__(self):
-        self.version = "6.1.0"
+        self.version = "6.2.0"
         self.bot_name = "iTethr Assistant"
         
         # AI settings
         self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))
         self.temperature = float(os.getenv('TEMPERATURE', '0.1'))
+        
+        # In-memory storage for embeddings
+        self.documents = []  # Store document chunks
+        self.embeddings = []  # Store their embeddings
+        self.metadata = []   # Store metadata
         
         # Setup bot
         self._setup_components()
@@ -53,15 +58,11 @@ class iTethrBot:
     def _setup_components(self):
         """Setup bot components"""
         try:
-            # Load embeddings (lightweight)
+            # Load embeddings model (lightweight)
             logger.info("Loading embeddings model...")
-            self.embeddings = SentenceTransformer('all-MiniLM-L6-v2')
+            self.embeddings_model = SentenceTransformer('all-MiniLM-L6-v2')
             
-            # Setup database
-            self.client = chromadb.PersistentClient(path='./knowledge_base')
-            self.collection = self.client.get_or_create_collection(name="docs")
-            
-            # Load documents
+            # Load documents and create embeddings
             self._load_all_documents()
             
             # Setup AI model (lightweight)
@@ -98,7 +99,7 @@ class iTethrBot:
             self.tokenizer = None
     
     def _load_all_documents(self):
-        """Load all documents from documents folder"""
+        """Load all documents and create embeddings in memory"""
         docs_folder = './documents'
         
         if not os.path.exists(docs_folder):
@@ -106,16 +107,14 @@ class iTethrBot:
             logger.info(f"📁 Created documents folder: {docs_folder}")
             return
         
-        # Clear and reload all documents
-        try:
-            self.collection.delete(where={})
-            logger.info("🗑️ Cleared old documents")
-        except:
-            pass
-        
         supported = ('.txt', '.md', '.py', '.js', '.json', '.yml', '.yaml', '.rst')
         loaded_count = 0
         total_chunks = 0
+        
+        # Clear existing data
+        self.documents = []
+        self.embeddings = []
+        self.metadata = []
         
         for filename in os.listdir(docs_folder):
             if filename.endswith(supported) and not filename.startswith('.'):
@@ -126,20 +125,17 @@ class iTethrBot:
                     if content and len(content.strip()) > 50:
                         chunks = self._create_chunks(content, filename)
                         
-                        for i, chunk in enumerate(chunks):
-                            embedding = self.embeddings.encode(chunk).tolist()
-                            chunk_id = f"{filename}_{i}_{hashlib.md5(chunk.encode()).hexdigest()[:6]}"
-                            
-                            self.collection.add(
-                                embeddings=[embedding],
-                                documents=[chunk],
-                                metadatas=[{
-                                    "filename": filename, 
-                                    "chunk_id": i,
-                                    "source": filename
-                                }],
-                                ids=[chunk_id]
-                            )
+                        # Create embeddings for all chunks at once (faster)
+                        chunk_embeddings = self.embeddings_model.encode(chunks)
+                        
+                        for i, (chunk, embedding) in enumerate(zip(chunks, chunk_embeddings)):
+                            self.documents.append(chunk)
+                            self.embeddings.append(embedding)
+                            self.metadata.append({
+                                "filename": filename,
+                                "chunk_id": i,
+                                "source": filename
+                            })
                         
                         loaded_count += 1
                         total_chunks += len(chunks)
@@ -147,6 +143,10 @@ class iTethrBot:
                 
                 except Exception as e:
                     logger.error(f"Failed loading {filename}: {e}")
+        
+        # Convert embeddings to numpy array for faster similarity search
+        if self.embeddings:
+            self.embeddings = np.array(self.embeddings)
         
         logger.info(f"✅ Total: {loaded_count} documents, {total_chunks} chunks loaded")
     
@@ -188,26 +188,26 @@ class iTethrBot:
         return chunks if chunks else [content]
     
     def _search_knowledge(self, question: str) -> List[str]:
-        """Search knowledge base"""
+        """Fast semantic search using cosine similarity"""
         try:
-            question_embedding = self.embeddings.encode(question.lower()).tolist()
+            if len(self.embeddings) == 0:
+                return []
             
-            results = self.collection.query(
-                query_embeddings=[question_embedding],
-                n_results=2,
-                include=['documents', 'distances', 'metadatas']
-            )
+            # Create embedding for the question
+            question_embedding = self.embeddings_model.encode([question])
+            
+            # Calculate cosine similarity with all document embeddings
+            similarities = cosine_similarity(question_embedding, self.embeddings)[0]
+            
+            # Get top 2 most similar documents
+            top_indices = np.argsort(similarities)[-2:][::-1]  # Top 2, highest first
             
             relevant_docs = []
-            if results['documents'] and results['distances']:
-                for doc, distance, metadata in zip(
-                    results['documents'][0], 
-                    results['distances'][0],
-                    results['metadatas'][0]
-                ):
-                    if distance < 1.5:
-                        relevant_docs.append(doc)
-                        logger.info(f"Found relevant content (distance: {distance:.2f}) from {metadata.get('filename', 'unknown')}")
+            for idx in top_indices:
+                similarity = similarities[idx]
+                if similarity > 0.3:  # Threshold for relevance
+                    relevant_docs.append(self.documents[idx])
+                    logger.info(f"Found relevant content (similarity: {similarity:.3f}) from {self.metadata[idx]['filename']}")
             
             return relevant_docs
             
@@ -222,12 +222,13 @@ class iTethrBot:
                 return self._fallback_response(context, question)
             
             # Create a simple prompt
-            prompt = f"Based on this documentation about iTethr:\n\n{context[:500]}\n\nQuestion: {question}\nAnswer:"
+            prompt = f"Based on this iTethr documentation:\n\n{context[:500]}\n\nQuestion: {question}\nAnswer:"
             
             # Tokenize
             inputs = self.tokenizer.encode(prompt, return_tensors='pt', truncate=True, max_length=512)
             
             # Generate response
+            import torch
             with torch.no_grad():
                 outputs = self.model.generate(
                     inputs,
@@ -327,89 +328,57 @@ bot = iTethrBot()
 def create_interface():
     """Create Gradio interface"""
     
-    TEAM_PASSWORD = os.getenv('BOT_ACCESS_PASSWORD', 'ADMIN')
-    
-    def authenticate(password):
-        if password.strip() == TEAM_PASSWORD:
-            return (
-                gr.update(visible=False),
-                gr.update(visible=True),
-                ""
-            )
-        else:
-            return (
-                gr.update(visible=True),
-                gr.update(visible=False),
-                "❌ Incorrect password. Please try again."
-            )
-    
     with gr.Blocks(
         title="iTethr Assistant",
         theme=gr.themes.Soft(primary_hue="blue")
     ) as interface:
         
-        # LOGIN SCREEN
-        with gr.Column(visible=False) as login_screen:
-            gr.Markdown("# 🔐 iTethr Assistant - Team Access")
-            password_input = gr.Textbox(label="Team Password", type="password")
-            login_btn = gr.Button("🚀 Access Bot", variant="primary")
-            login_status = gr.Markdown("")
+        # Skip login - go straight to bot
+        gr.Markdown(f"""
+        # 🤖 iTethr Assistant
+        **Accurate insights from iTethr docs — powered by Semantic Search**
         
-        # BOT INTERFACE
-        with gr.Column(visible=True) as bot_interface:
-            gr.Markdown(f"""
-            # 🤖 iTethr Assistant
-            **Accurate insights from iTethr docs — powered by Hugging Face**
-            
-            *Fast and reliable - v{bot.version}*
-            """)
-            
-            chatbot = gr.Chatbot(
-                height=550,
-                label="💬 Chat with iTethr Assistant",
-                show_copy_button=True,
-                #placeholder="Ask me anything about iTethr platform..."
-            )
-            
-            with gr.Row():
-                msg = gr.Textbox(
-                    placeholder="Type your question about iTethr...",
-                    label="",
-                    scale=5,
-                    max_lines=3
-                )
-                send = gr.Button("Send ⚡", variant="primary", scale=1)
-            
-            # Quick suggestions
-            gr.Markdown("### 💡 Quick Questions")
-            with gr.Row():
-                btn1 = gr.Button("What is iTethr?", size="sm")
-                btn2 = gr.Button("Community structure?", size="sm")
-                btn3 = gr.Button("How to sign up?", size="sm")
-            
-            def safe_chat(message, history):
-                try:
-                    return bot.chat(message, history)
-                except Exception as e:
-                    logger.error(f"Chat error: {e}")
-                    if message.strip():
-                        history.append((message, f"Sorry, I encountered an error: {str(e)}"))
-                    return "", history
-            
-            # Connect events
-            send.click(safe_chat, [msg, chatbot], [msg, chatbot])
-            msg.submit(safe_chat, [msg, chatbot], [msg, chatbot])
-            
-            btn1.click(lambda: "What is iTethr platform?", outputs=msg)
-            btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
-            btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
+        *Fast and reliable - v{bot.version}*
+        """)
         
-        # Connect login
-        login_btn.click(
-            authenticate,
-            [password_input],
-            [login_screen, bot_interface, login_status]
+        chatbot = gr.Chatbot(
+            height=550,
+            label="💬 Chat with iTethr Assistant",
+            show_copy_button=True
         )
+        
+        with gr.Row():
+            msg = gr.Textbox(
+                placeholder="Type your question about iTethr...",
+                label="",
+                scale=5,
+                max_lines=3
+            )
+            send = gr.Button("Send ⚡", variant="primary", scale=1)
+        
+        # Quick suggestions
+        gr.Markdown("### 💡 Quick Questions")
+        with gr.Row():
+            btn1 = gr.Button("What is iTethr?", size="sm")
+            btn2 = gr.Button("Community structure?", size="sm")
+            btn3 = gr.Button("How to sign up?", size="sm")
+        
+        def safe_chat(message, history):
+            try:
+                return bot.chat(message, history)
+            except Exception as e:
+                logger.error(f"Chat error: {e}")
+                if message.strip():
+                    history.append((message, f"Sorry, I encountered an error: {str(e)}"))
+                return "", history
+        
+        # Connect events
+        send.click(safe_chat, [msg, chatbot], [msg, chatbot])
+        msg.submit(safe_chat, [msg, chatbot], [msg, chatbot])
+        
+        btn1.click(lambda: "What is iTethr platform?", outputs=msg)
+        btn2.click(lambda: "Explain iTethr community structure", outputs=msg)
+        btn3.click(lambda: "How does iTethr authentication work?", outputs=msg)
     
     # Health check
     @interface.app.get("/health")
@@ -419,7 +388,8 @@ def create_interface():
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
             "service": "itethr-bot",
-            "version": bot.version
+            "version": bot.version,
+            "documents_loaded": len(bot.documents)
         }, status_code=200)
     
     return interface
