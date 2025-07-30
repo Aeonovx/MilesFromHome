@@ -1,4 +1,4 @@
-# iTethr Bot - AeonovX Team Version (Railway Compatible)
+# iTethr Bot - AeonovX Team Version with AI Welcome (Railway Compatible)
 # File: app.py
 
 import gradio as gr
@@ -16,8 +16,7 @@ import signal
 import sys
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from team_manager import AEONOVX_TEAM, USER_WELCOMES
-
+from team_manager import AEONOVX_TEAM
 
 # Load environment variables
 try:
@@ -25,7 +24,6 @@ try:
     load_dotenv()
 except ImportError:
     print("python-dotenv not available, using system environment variables")
-
 
 # Configure logging
 logging.basicConfig(
@@ -38,11 +36,62 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def generate_ai_welcome(name, role):
+    """Generate personalized AI welcome message using Groq"""
+    try:
+        groq_api_key = os.getenv('GROQ_API_KEY', '')
+        if not groq_api_key:
+            return f"Welcome {name}! Great to have you on the AeonovX team! 🚀"
+        
+        groq_client = Groq(api_key=groq_api_key)
+        
+        prompt = f"""Generate a personalized, friendly welcome message for {name} who is a {role} at AeonovX company. 
+
+Requirements:
+- Keep it under 50 words
+- Make it specific to their role and what they might need help with
+- Be professional but warm and encouraging
+- Include relevant emojis (1-2 max)
+- Mention they can ask about iTethr platform, projects, or team resources
+- Sound natural and conversational
+
+Name: {name}
+Role: {role}
+Company: AeonovX
+
+Generate a unique welcome message:"""
+
+        response = groq_client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama3-8b-8192",
+            temperature=0.8,  # Higher temperature for more creative welcomes
+            max_tokens=80,
+            top_p=0.9
+        )
+        
+        ai_welcome = response.choices[0].message.content.strip()
+        return ai_welcome if ai_welcome else f"Welcome {name}! Great to have you on the AeonovX team! 🚀"
+        
+    except Exception as e:
+        logger.error(f"AI welcome generation failed: {e}")
+        # Fallback welcome messages based on role
+        role_welcomes = {
+            "Lead Developer": f"Welcome {name}! Ready to architect amazing solutions? 🚀",
+            "UI/UX Designer": f"Hi {name}! Time to create beautiful user experiences! 🎨",
+            "Backend Developer": f"Hey {name}! Let's build robust systems together! ⚙️",
+            "Frontend Developer": f"Welcome {name}! Ready to bring designs to life? 💻",
+            "Project Manager": f"Hi {name}! Let's keep projects on track and teams aligned! 📊",
+            "DevOps Engineer": f"Hey {name}! Infrastructure and deployments await! 🔧",
+            "QA Engineer": f"Welcome {name}! Quality and testing excellence ahead! 🧪",
+            "Administrator": f"Welcome {name}! Full system control at your fingertips! 👑"
+        }
+        return role_welcomes.get(role, f"Welcome {name}! Great to have you on the AeonovX team! 🚀")
+
 class iTethrBot:
     """iTethr Bot - Powered by AeonovX"""
     
     def __init__(self):
-        self.version = "7.1.0"
+        self.version = "7.2.0"
         self.bot_name = "AeonovX iTethr Assistant"
         
         # Setup Groq API
@@ -314,12 +363,16 @@ Try asking about any of these topics! 🚀"""
 bot = iTethrBot()
 
 def authenticate(name, password):
-    """Authenticate AeonovX team members - both name and password must match"""
+    """Authenticate AeonovX team members with AI-generated welcome"""
     
     if name in AEONOVX_TEAM and AEONOVX_TEAM[name]["password"] == password:
-        welcome_msg = USER_WELCOMES.get(name, f"Welcome {name}! 🚀")
         role = AEONOVX_TEAM[name]["role"]
-        full_welcome = f"{welcome_msg}\n\n**Role:** {role}\n**Access Level:** AeonovX Team Member"
+        
+        # Generate AI welcome message
+        logger.info(f"Generating AI welcome for {name} ({role})")
+        ai_welcome = generate_ai_welcome(name, role)
+        
+        full_welcome = f"🤖 **AI Assistant**: {ai_welcome}\n\n**Your Role:** {role}\n**Access Level:** AeonovX Team Member\n\n*Ready to help with iTethr platform questions, project info, and team resources!*"
         
         return (
             gr.update(visible=False),  # Hide login
@@ -347,7 +400,7 @@ def create_interface():
             # 🏢 AeonovX iTethr Assistant
             **Internal Team Access Only - Authorized Personnel Required**
             
-            *Secure access for AeonovX team members and authorized personnel*
+            *Secure access for AeonovX team members with AI-powered personalized experience*
             """)
             
             name_input = gr.Textbox(
@@ -371,7 +424,7 @@ def create_interface():
             # 🚀 AeonovX iTethr Assistant
             **Internal Knowledge Base - Powered by AeonovX Intelligence**
             
-            *Lightning fast responses - v{bot.version} | Team Edition*
+            *AI-powered responses with personalized welcome - v{bot.version} | Team Edition*
             """)
             
             chatbot = gr.Chatbot(
@@ -406,6 +459,7 @@ def create_interface():
             ### ⚡ Powered by AeonovX Intelligence
             
             **Team Features:**
+            • **AI-generated welcomes** – Personalized greetings for each team member 🤖
             • **Ultra-fast responses** – Groq-powered AI inference ⚡
             • **Smart understanding** – Advanced Llama models for precise answers
             • **Semantic search** – Finds relevant info with natural language
@@ -413,7 +467,7 @@ def create_interface():
             • **Team-optimized** – Built specifically for AeonovX workflow
             • **Secure access** – Protected team-only environment 🔒
                         
-            **Available 24/7 for the AeonovX team** - Your AI-powered knowledge companion.
+            **Available 24/7 for the AeonovX team** - Your AI-powered knowledge companion with personality!
             """)
             
             def safe_chat(message, history):
@@ -454,7 +508,8 @@ def create_interface():
             "version": bot.version,
             "documents_loaded": len(bot.documents),
             "groq_api_configured": bool(bot.groq_api_key),
-            "team_members_active": len(AEONOVX_TEAM)
+            "team_members_active": len(AEONOVX_TEAM),
+            "features": ["ai_welcome", "semantic_search", "team_auth"]
         }, status_code=200)
     
     return interface
@@ -477,6 +532,7 @@ if __name__ == "__main__":
     try:
         logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
         logger.info(f"👥 Team members configured: {len(AEONOVX_TEAM)}")
+        logger.info(f"🤖 AI welcome messages: {'Enabled' if os.getenv('GROQ_API_KEY') else 'Disabled (fallback)'}")
         
         interface = create_interface()
         port = setup_railway_config()
