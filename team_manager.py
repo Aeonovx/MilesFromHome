@@ -4,14 +4,14 @@
 
 # Team member database - Both name and password must match exactly
 AEONOVX_TEAM = {
-    "John Smith": {"password": "dev123", "role": "Lead Developer"},
-    "Sarah Wilson": {"password": "sarah2024", "role": "UI/UX Designer"}, 
-    "Mike Chen": {"password": "mike456", "role": "Backend Developer"},
-    "Alex Johnson": {"password": "alex789", "role": "Frontend Developer"},
-    "Maria Garcia": {"password": "maria2024", "role": "Project Manager"},
-    "David Brown": {"password": "david456", "role": "DevOps Engineer"},
-    "Lisa Park": {"password": "lisa123", "role": "QA Engineer"},
-    "Admin": {"password": "admin2024", "role": "Administrator"}
+    "Sharjan": {"password": "i1234", "role": "Lead Developer"},
+    "Naveen": {"password": "i1234", "role": "UI/UX Designer"}, 
+    "Stephen": {"password": "i1234", "role": "Backend Developer"},
+    "Albert": {"password": "i1234", "role": "Frontend Developer"},
+    "Akhiljith": {"password": "i1234", "role": "Project Manager"},
+    # "David Brown": {"password": "david456", "role": "DevOps Engineer"},
+    # "Lisa Park": {"password": "lisa123", "role": "QA Engineer"},
+    # "Admin": {"password": "admin2024", "role": "Administrator"}
 }
 
 # Custom welcome messages per team member
