@@ -8,7 +8,7 @@ gunicorn==21.2.0
 torch==2.1.0
 transformers==4.35.0
 sentence-transformers==2.2.2
-chromadb==0.4.15
+chromadb==0.3.29
 
 # UI Framework
 gradio==4.7.1
