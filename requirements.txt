@@ -7,8 +7,11 @@ numpy==1.24.3
 # Groq API
 groq==0.4.1
 
-# UI Framework   
+# UI Framework with compatible versions
 gradio==4.7.1
+pydantic==1.10.12
+fastapi==0.68.0
+starlette==0.14.2
 
 # Utilities
 python-dotenv==1.0.0
