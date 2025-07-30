@@ -13,11 +13,10 @@ chromadb==0.3.29
 # UI Framework
 gradio==4.7.1
 
-# Fix Pydantic Schema Error
-pydantic==2.8.2
-pydantic-core==2.20.1
-fastapi==0.111.0
-starlette>=0.27.0,<0.40.0
+# Compatible versions for chromadb 0.3.29
+pydantic==1.10.12
+fastapi==0.68.0
+starlette==0.14.2
 
 # Utilities
 requests==2.31.0
