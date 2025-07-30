@@ -36,7 +36,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class iTethrBot:
-    """iTethr Bot - Powered by Groq API"""
+    """iTethr Bot - Powered by AeonovX"""
     
     def __init__(self):
         self.version = "7.0.0"
@@ -320,22 +320,11 @@ def create_interface():
         # Header
         gr.Markdown(f"""
         # 🚀 iTethr Assistant
-        **Accurate insights from iTethr docs — powered by Groq AI**
+        **Accurate insights from iTethr docs — powered by AeonovX**
         
         *Lightning fast responses - v{bot.version}*
         """)
-        
-        # API Key status
-        if not bot.groq_api_key:
-            gr.Markdown("""
-            ⚠️ **GROQ_API_KEY not configured**
-            
-            Add your free Groq API key to Railway environment variables:
-            1. Get key from: https://console.groq.com/keys
-            2. Add to Railway: Settings → Variables → GROQ_API_KEY
-            
-            *Bot will use fallback responses until API key is added.*
-            """)
+    
         
         chatbot = gr.Chatbot(
             height=550,
@@ -365,15 +354,15 @@ def create_interface():
             btn6 = gr.Button("iTethr iFeed features?", size="sm")
         
         gr.Markdown("""
-        ### ⚡ Powered by Groq AI
+        ### ⚡ Powered by AeonovX
         
         **Features:**
         • **Ultra-fast responses** – Groq's lightning-speed inference ⚡
         • **Smart understanding** – Advanced Llama models for accurate answers
         • **Semantic search** – Finds relevant info even with different wording
         • **Always up-to-date** – Based on official iTethr documentation
-        
-        **Free tier:** 6,000 requests per day - perfect for team use!
+        • **Community-driven** – Built for iTethr community needs
+                    
         """)
         
         def safe_chat(message, history):
