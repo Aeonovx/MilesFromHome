@@ -349,14 +349,14 @@ def create_interface():
     ) as interface:
         
         # LOGIN SCREEN
-        with gr.Column(visible=True) as login_screen:
+        with gr.Column(visible=False) as login_screen:
             gr.Markdown("# 🔐 iTethr Assistant - Team Access")
             password_input = gr.Textbox(label="Team Password", type="password")
             login_btn = gr.Button("🚀 Access Bot", variant="primary")
             login_status = gr.Markdown("")
         
         # BOT INTERFACE
-        with gr.Column(visible=False) as bot_interface:
+        with gr.Column(visible=True) as bot_interface:
             gr.Markdown(f"""
             # 🤖 iTethr Assistant
             **Accurate insights from iTethr docs — powered by Hugging Face**
