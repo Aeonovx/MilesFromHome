@@ -16,7 +16,7 @@ import signal
 import sys
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from team_members import AEONOVX_TEAM, USER_WELCOMES
+from team_manager import AEONOVX_TEAM, USER_WELCOMES
 
 
 # Load environment variables
@@ -25,7 +25,7 @@ try:
     load_dotenv()
 except ImportError:
     print("python-dotenv not available, using system environment variables")
-    
+
 
 # Configure logging
 logging.basicConfig(
