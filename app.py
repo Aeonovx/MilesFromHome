@@ -368,7 +368,7 @@ def create_interface():
                 height=550,
                 label="💬 Chat with iTethr Assistant",
                 show_copy_button=True,
-                placeholder="Ask me anything about iTethr platform..."
+                #placeholder="Ask me anything about iTethr platform..."
             )
             
             with gr.Row():

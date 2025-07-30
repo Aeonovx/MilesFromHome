@@ -11,7 +11,7 @@ sentence-transformers==2.2.2
 chromadb==0.4.15
 
 # UI Framework
-gradio==4.20.0
+gradio==4.7.1
 
 # Utilities
 requests==2.31.0
