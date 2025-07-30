@@ -66,7 +66,7 @@ USER nobody
 ENV RAILWAY_ENVIRONMENT=production \
     GRADIO_SHARE=false \
     DEBUG=false \
-    PORT=7860 \
+    PORT=7860
 
 # Start the application
 CMD ["/bin/sh", "./start.sh"]
