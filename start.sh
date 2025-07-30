@@ -18,13 +18,13 @@ check_ollama() {
     curl -s -f http://localhost:11434/api/tags >/dev/null
 }
 
-# Start Ollama service with retry mechanism
+# Start Ollama service
 echo "🤖 Starting Ollama service..."
 ollama serve &
 OLLAMA_PID=$!
 
 # Wait for Ollama with timeout
-TIMEOUT=60
+TIMEOUT=120  # seconds
 ELAPSED=0
 echo "⏳ Waiting for Ollama to start (timeout: ${TIMEOUT}s)..."
 until check_ollama || [ $ELAPSED -ge $TIMEOUT ]; do
@@ -55,19 +55,6 @@ echo "✅ Model $MODEL is ready"
 export RAILWAY_ENVIRONMENT=production
 export GRADIO_SHARE=false
 # export DEBUG=true  # Temporary for debugging
-
-# # Start the health check endpoint first
-# echo "🏥 Starting health check endpoint..."
-# python -c "
-# from flask import Flask
-# app = Flask(__name__)
-# @app.route('/health')
-# def health(): return {'status': 'initializing'}, 200
-# " &
-# HEALTH_PID=$!
-
-# # Give health endpoint time to start
-# sleep 5
 
 echo "🌐 Starting iTethr Bot on port $PORT..."
 # Start the main application
