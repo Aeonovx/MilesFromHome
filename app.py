@@ -1,4 +1,4 @@
-# Optimized Fast & Accurate iTethr Bot
+# Optimized Fast & Accurate iTethr Bot - Railway Fixed
 # File: app.py
 
 import gradio as gr
@@ -8,7 +8,6 @@ from sentence_transformers import SentenceTransformer
 import ollama
 import json
 import yaml
-from flask import Flask, request, jsonify
 import threading
 import time
 import logging
@@ -18,9 +17,6 @@ import uuid
 import hashlib
 import signal
 import sys
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 
 # Load environment variables
 try:
@@ -49,8 +45,15 @@ class OptimizediTethrBot:
         
         # Optimized AI settings for speed and accuracy
         self.model_name = os.getenv('AI_MODEL', 'qwen2.5:1.5b')
-        self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))  # Reduced for speed
-        self.temperature = float(os.getenv('TEMPERATURE', '0.01'))  # Very low to prevent hallucination
+        self.max_tokens = int(os.getenv('MAX_TOKENS', '200'))
+        self.temperature = float(os.getenv('TEMPERATURE', '0.01'))
+        
+        # Health status
+        self.health_status = {
+            "bot": "initializing",
+            "database": "initializing",
+            "model": "initializing"
+        }
         
         # Setup bot
         self._setup_components()
@@ -66,18 +69,39 @@ class OptimizediTethrBot:
             # Setup database
             self.client = chromadb.PersistentClient(path='./knowledge_base')
             self.collection = self.client.get_or_create_collection(name="docs")
+            self.health_status["database"] = "healthy"
             
             # Load documents
             self._load_all_documents()
             
+            # Test model availability
+            self._test_model()
+            
             # Stats
             self.total_questions = 0
+            self.health_status["bot"] = "healthy"
             
             logger.info("✅ All components optimized and ready!")
             
         except Exception as e:
             logger.error(f"Setup failed: {e}")
+            self.health_status["bot"] = "unhealthy"
             raise
+    
+    def _test_model(self):
+        """Test if Ollama model is available"""
+        try:
+            logger.info(f"Testing model: {self.model_name}")
+            result = ollama.generate(
+                model=self.model_name,
+                prompt="Test",
+                options={'max_tokens': 10}
+            )
+            self.health_status["model"] = "healthy"
+            logger.info("✅ Model test successful")
+        except Exception as e:
+            logger.error(f"Model test failed: {e}")
+            self.health_status["model"] = "unhealthy"
     
     def _load_all_documents(self):
         """Load all documents from documents folder"""
@@ -153,12 +177,10 @@ class OptimizediTethrBot:
             logger.error(f"Error reading {filepath}: {e}")
             return None
     
-
     def _create_chunks(self, content: str, filename: str) -> List[str]:
         """Create optimized text chunks"""
-        # Smaller chunks for faster processing
-        chunk_size = 250  # Reduced from 300
-        overlap = 30      # Reduced overlap
+        chunk_size = 250
+        overlap = 30
         
         words = content.split()
         chunks = []
@@ -171,16 +193,14 @@ class OptimizediTethrBot:
         
         return chunks if chunks else [content]
     
-    
     def _search_knowledge(self, question: str) -> List[str]:
         """Optimized search with strict relevance"""
         try:
-            # Quick embedding
             question_embedding = self.embeddings.encode(question.lower()).tolist()
             
             results = self.collection.query(
                 query_embeddings=[question_embedding],
-                n_results=2,  # Reduced for speed
+                n_results=2,
                 include=['documents', 'distances', 'metadatas']
             )
             
@@ -191,7 +211,6 @@ class OptimizediTethrBot:
                     results['distances'][0],
                     results['metadatas'][0]
                 ):
-                    # More lenient threshold but log for debugging
                     if distance < 1.5:
                         relevant_docs.append(doc)
                         logger.info(f"Found relevant content (distance: {distance:.2f}) from {metadata.get('filename', 'unknown')}")
@@ -201,7 +220,6 @@ class OptimizediTethrBot:
         except Exception as e:
             logger.error(f"Search error: {e}")
             return []
-        
     
     def get_response(self, message: str) -> str:
         """Optimized response generation - Fast & Accurate"""
@@ -228,7 +246,6 @@ That info's either top secret, lost in the Matrix, or my hamster-powered memory 
 • I assistant capabilities (Aeono)  
 • Technical implementation details
 • iTethr iFeed functionality
-
 
 Try asking about any of these — I'll respond faster than your group chat drama. 📲🔥"""
 
@@ -258,18 +275,16 @@ ANSWER:"""
                 model=self.model_name,
                 prompt=prompt,
                 options={
-                    'temperature': 0.01,    # Almost no creativity
-                    'max_tokens': 200,      # Shorter for speed
-                    'num_predict': 200,     # Match max_tokens
-                    'top_p': 0.1,          # Very focused
-                    'repeat_penalty': 1.0,  # No penalty
-                    'num_ctx': 1024        # Smaller context window
+                    'temperature': 0.01,
+                    'max_tokens': 200,
+                    'num_predict': 200,
+                    'top_p': 0.1,
+                    'repeat_penalty': 1.0,
+                    'num_ctx': 1024
                 }
             )
             
             response = result['response'].strip()
-            
-            # Add source attribution
             response += f"\n\n*Based on iTethr documentation*"
             
             # Log response time
@@ -288,76 +303,40 @@ ANSWER:"""
             response = self.get_response(message)
             history.append((message, response))
         return "", history
+    
+    def get_health_status(self):
+        """Get current health status"""
+        overall_status = "healthy"
+        
+        # Check database
+        try:
+            self.collection.count()
+            self.health_status["database"] = "healthy"
+        except Exception:
+            self.health_status["database"] = "unhealthy"
+            overall_status = "degraded"
+        
+        # Check bot response
+        try:
+            self.get_response("test")
+            self.health_status["bot"] = "healthy"
+        except Exception:
+            self.health_status["bot"] = "unhealthy"
+            overall_status = "degraded"
+        
+        return {
+            "status": overall_status,
+            "timestamp": datetime.utcnow().isoformat(),
+            "version": self.version,
+            "components": self.health_status
+        }
 
 # Initialize optimized bot
 bot = OptimizediTethrBot()
 
-
-
-# Fixed Gradio Interface
 def create_interface():
-
-    interface = gr.Interface(
-        fn=bot.chat,
-        inputs=[
-            gr.components.Textbox(
-                label="iTethr Assistant",
-                placeholder="Ask about iTethr..."
-            ),
-            gr.components.State()
-        ],
-        outputs=[
-            gr.components.Textbox(label="iTethr Assistant"),
-            gr.components.State()
-        ],
-        live=True
-    )
-
-    app: FastAPI = interface.app  # This gives you access to Gradio’s server
-
-    app = FastAPI()
-
-    @app.get("/health")   #health check endpoint
-    async def health():
-        try:
-            health_status = {
-                "status": "healthy",
-                "timestamp": datetime.utcnow().isoformat(),
-                "version": bot.version,
-                "components": {
-                    "bot": "healthy",
-                    "database": "unknown"
-                }
-            }
-            
-            # Check ChromaDB
-            try:
-                bot.collection.count()
-                health_status["components"]["database"] = "healthy"
-            except Exception as e:
-                health_status["components"]["database"] = "unhealthy"
-                health_status["status"] = "degraded"
-            
-            # Check if bot is responding
-            try:
-                bot.get_response("test")
-                health_status["components"]["bot"] = "healthy"
-            except Exception as e:
-                health_status["components"]["bot"] = "unhealthy"
-                health_status["status"] = "degraded"
-                
-            status_code = 200 if health_status["status"] == "healthy" else 503
-            return JSONResponse(content=health_status, status_code=status_code)
-        except Exception as e:
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "status": "unhealthy",
-                    "error": str(e),
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            )
-
+    """Create the Gradio interface with health check"""
+    
     # Get team password from environment
     TEAM_PASSWORD = os.getenv('BOT_ACCESS_PASSWORD', 'itethr2024')
     
@@ -391,9 +370,8 @@ def create_interface():
             login_btn = gr.Button("🚀 Access Bot", variant="primary")
             login_status = gr.Markdown("")
         
-        # BOT INTERFACE - FIXED STRUCTURE
+        # BOT INTERFACE
         with gr.Column(visible=False) as bot_interface:
-            # Clean header
             gr.Markdown(f"""
             # 🤖 iTethr Assistant
             **Accurate, on-demand insights from iTethr docs — powered by AeonovX**
@@ -420,7 +398,7 @@ def create_interface():
                         )
                         send = gr.Button("Send ⚡", variant="primary", scale=1)
             
-            # Optimized quick suggestions
+            # Quick suggestions
             gr.Markdown("### 💡 Quick Questions (Click to Ask)")
             with gr.Row():
                 btn1 = gr.Button("What is iTethr platform?", size="sm", variant="secondary")
@@ -432,7 +410,6 @@ def create_interface():
                 btn5 = gr.Button("Tell me about Aeono AI", size="sm", variant="secondary")
                 btn6 = gr.Button("What is iTethr iFeed?", size="sm", variant="secondary")
             
-            # Simple instructions
             gr.Markdown("""
             ### ⚡ Built for Speed, Trained for Truth
             
@@ -440,7 +417,6 @@ def create_interface():
             • **Blazing-fast replies** – Like, caffeine-injected fast ☕⚡
             • **Seriously accurate** – No guesswork, no hallucinations, just facts
             • **One-click copy** – Hit that copy button and boom, info's yours  
-
             
             **Tips:**
             • Be specific – Vague questions confuse my circuits 🌀 
@@ -448,7 +424,7 @@ def create_interface():
             • I only spill knowledge from official iTethr docs (no gossip here 😇)
             """)
             
-            # Connect events with error handling - MOVED INSIDE bot_interface
+            # Connect events with error handling
             def safe_chat(message, history):
                 try:
                     return bot.chat(message, history)
@@ -470,15 +446,23 @@ def create_interface():
             btn5.click(lambda: "Tell me about Aeono AI", outputs=msg)
             btn6.click(lambda: "What is iTethr iFeed?", outputs=msg)
         
-        # CONNECT LOGIN - MOVED TO END
+        # Connect login
         login_btn.click(
             authenticate,
             [password_input],
             [login_screen, bot_interface, login_status]
         )
+    
+    # Add health check endpoint to Gradio's FastAPI app
+    @interface.app.get("/health")
+    async def health_check():
+        health_data = bot.get_health_status()
+        status_code = 200 if health_data["status"] == "healthy" else 503
         
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content=health_data, status_code=status_code)
+    
     return interface
-
 
 def setup_railway_config():
     """Configure app for Railway deployment"""
@@ -500,9 +484,7 @@ def setup_railway_config():
     
     return int(os.getenv('PORT', '7860'))
 
-
-
-# Add graceful shutdown handler
+# Graceful shutdown handler
 def signal_handler(sig, frame):
     logger.info('🛑 Graceful shutdown initiated...')
     sys.exit(0)
@@ -510,9 +492,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
-
-# Main runner (FIXED - Railway config AFTER bot creation)
-
+# Main runner
 if __name__ == "__main__":
     try:
         logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
@@ -521,7 +501,7 @@ if __name__ == "__main__":
         interface = create_interface()
         port = setup_railway_config()
 
-        # Enhanced launch configuration
+        # Enhanced launch configuration for Railway
         interface.launch(
             server_name="0.0.0.0",
             server_port=port,

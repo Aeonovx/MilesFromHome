@@ -37,7 +37,7 @@ RUN mkdir -p \
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python packages
+# Install Python packages with optimizations
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt \
     --extra-index-url https://download.pytorch.org/whl/cpu
@@ -52,11 +52,8 @@ RUN chmod +x start.sh
 RUN chown -R nobody:nogroup /app && \
     chmod -R 755 /app
 
-# Add healthcheck
-# ...existing code...
-
-# Add healthcheck with increased timeouts and startup period
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+# Health check with proper timing
+HEALTHCHECK --interval=30s --timeout=15s --start-period=180s --retries=5 \
     CMD curl -f http://localhost:${PORT:-7860}/health || exit 1
 
 # Expose necessary ports
@@ -69,8 +66,7 @@ USER nobody
 ENV RAILWAY_ENVIRONMENT=production \
     GRADIO_SHARE=false \
     DEBUG=false \
-    PORT=7860 \
-    HEALTH_CHECK_ENABLED=true
+    PORT=7860
 
-# Start the application (single CMD instruction)
+# Start the application
 CMD ["/bin/sh", "./start.sh"]
