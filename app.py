@@ -3,6 +3,7 @@
 
 import gradio as gr
 import os
+import torch
 import chromadb
 from sentence_transformers import SentenceTransformer
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
