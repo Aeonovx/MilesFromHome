@@ -18,6 +18,9 @@ import uuid
 import hashlib
 import signal
 import sys
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 # Load environment variables
 try:
@@ -150,6 +153,7 @@ class OptimizediTethrBot:
             logger.error(f"Error reading {filepath}: {e}")
             return None
     
+
     def _create_chunks(self, content: str, filename: str) -> List[str]:
         """Create optimized text chunks"""
         # Smaller chunks for faster processing
@@ -166,6 +170,7 @@ class OptimizediTethrBot:
                 chunks.append(chunk_text.strip())
         
         return chunks if chunks else [content]
+    
     
     def _search_knowledge(self, question: str) -> List[str]:
         """Optimized search with strict relevance"""
@@ -196,6 +201,7 @@ class OptimizediTethrBot:
         except Exception as e:
             logger.error(f"Search error: {e}")
             return []
+        
     
     def get_response(self, message: str) -> str:
         """Optimized response generation - Fast & Accurate"""
@@ -286,46 +292,72 @@ ANSWER:"""
 # Initialize optimized bot
 bot = OptimizediTethrBot()
 
-#Health API
-app = Flask(__name__)
 
-@app.route('/health', methods=['GET'])
-def health():
-    try:
-        # Check if Ollama is running
-        ollama_status = "unhealthy"
-        try:
-            response = requests.get('http://localhost:11434/api/tags', timeout=5)
-            if response.status_code == 200:
-                ollama_status = "healthy"
-        except:
-            pass
-
-        return jsonify({
-            "status": "healthy",
-            "bot": bot.bot_name,
-            "version": bot.version,
-            "model": bot.model_name,
-            "questions_answered": bot.total_questions,
-            "ollama_status": ollama_status,
-            "timestamp": datetime.now().isoformat(),
-            "railway": os.getenv('RAILWAY_ENVIRONMENT') == 'production'
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "status": "unhealthy",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }), 500
-
-def run_api():
-    try:
-        app.run(host='0.0.0.0', port=int(os.getenv('API_PORT', '5001')), debug=False)
-    except Exception as e:
-        logger.warning(f"API port issue: {e}")
 
 # Fixed Gradio Interface
 def create_interface():
+
+    interface = gr.Interface(
+        fn=bot.chat,
+        inputs=[
+            gr.components.Textbox(
+                label="iTethr Assistant",
+                placeholder="Ask about iTethr..."
+            ),
+            gr.components.State()
+        ],
+        outputs=[
+            gr.components.Textbox(label="iTethr Assistant"),
+            gr.components.State()
+        ],
+        live=True
+    )
+
+    app: FastAPI = interface.app  # This gives you access to Gradio’s server
+
+    app = FastAPI()
+
+    @app.get("/health")   #health check endpoint
+    async def health():
+        try:
+            health_status = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "version": bot.version,
+                "components": {
+                    "bot": "healthy",
+                    "database": "unknown"
+                }
+            }
+            
+            # Check ChromaDB
+            try:
+                bot.collection.count()
+                health_status["components"]["database"] = "healthy"
+            except Exception as e:
+                health_status["components"]["database"] = "unhealthy"
+                health_status["status"] = "degraded"
+            
+            # Check if bot is responding
+            try:
+                bot.get_response("test")
+                health_status["components"]["bot"] = "healthy"
+            except Exception as e:
+                health_status["components"]["bot"] = "unhealthy"
+                health_status["status"] = "degraded"
+                
+            status_code = 200 if health_status["status"] == "healthy" else 503
+            return JSONResponse(content=health_status, status_code=status_code)
+        except Exception as e:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "status": "unhealthy",
+                    "error": str(e),
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+
     # Get team password from environment
     TEAM_PASSWORD = os.getenv('BOT_ACCESS_PASSWORD', 'itethr2024')
     
@@ -447,7 +479,7 @@ def create_interface():
         
     return interface
 
-# Railway-specific configurations (MOVED TO CORRECT LOCATION - AFTER BOT CREATION)
+
 def setup_railway_config():
     """Configure app for Railway deployment"""
     if os.getenv('RAILWAY_ENVIRONMENT') == 'production':
@@ -468,6 +500,8 @@ def setup_railway_config():
     
     return int(os.getenv('PORT', '7860'))
 
+
+
 # Add graceful shutdown handler
 def signal_handler(sig, frame):
     logger.info('🛑 Graceful shutdown initiated...')
@@ -476,30 +510,27 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
+
 # Main runner (FIXED - Railway config AFTER bot creation)
+
 if __name__ == "__main__":
-    logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
-    logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens} | Temperature: {bot.temperature}")
-    
-    # Setup Railway configuration (NOW bot exists!)
-    port = setup_railway_config()
-    
-    # Start health API in background
     try:
-        api_thread = threading.Thread(target=run_api, daemon=True)
-        api_thread.start()
-        logger.info("🔗 Health API started")
+        logger.info(f"🚀 Starting {bot.bot_name} v{bot.version}")
+        logger.info(f"⚡ Model: {bot.model_name} | Max Tokens: {bot.max_tokens}")
+        
+        interface = create_interface()
+        port = setup_railway_config()
+
+        # Enhanced launch configuration
+        interface.launch(
+            server_name="0.0.0.0",
+            server_port=port,
+            share=False,
+            debug=False,
+            show_error=True,
+            prevent_thread_lock=False,
+            quiet=os.getenv('RAILWAY_ENVIRONMENT') == 'production'
+        )
     except Exception as e:
-        logger.warning(f"API startup issue: {e}")
-    
-    # Launch optimized interface
-    interface = create_interface()
-    interface.launch(
-        server_name="0.0.0.0",
-        server_port=port,
-        share=False,  # Railway handles public URLs
-        debug=False,
-        show_error=True,
-        prevent_thread_lock=False,
-        quiet=True if os.getenv('RAILWAY_ENVIRONMENT') == 'production' else False
-    )
+        logger.error(f"Failed to start application: {e}")
+        sys.exit(1)

@@ -54,7 +54,7 @@ echo "✅ Model $MODEL is ready"
 # Set Railway-specific environment variables
 export RAILWAY_ENVIRONMENT=production
 export GRADIO_SHARE=false
-export DEBUG=true  # Temporary for debugging
+# export DEBUG=true  # Temporary for debugging
 
 # # Start the health check endpoint first
 # echo "🏥 Starting health check endpoint..."
