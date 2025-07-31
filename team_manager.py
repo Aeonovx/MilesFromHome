@@ -4,11 +4,11 @@
 
 # Team member database - Both name and password must match exactly
 AEONOVX_TEAM = {
-    "Sharjan": {"password": "i1234", "role": "Lead Developer"},
-    "Naveen": {"password": "i1234", "role": "UI/UX Designer"}, 
+    "Sharjan": {"password": "i1234", "role": "Financial Analyst"},
+    "Naveen": {"password": "i1234", "role": "AI Dveloper"}, 
     "Stephen": {"password": "i1234", "role": "Backend Developer"},
     "Albert": {"password": "i1234", "role": "Frontend Developer"},
-    "Akhiljith": {"password": "i1234", "role": "Project Manager"},
+    "Akhiljith": {"password": "i1234", "role": "UI designer"},
     # "David Brown": {"password": "david456", "role": "DevOps Engineer"},
     # "Lisa Park": {"password": "lisa123", "role": "QA Engineer"},
     # "Admin": {"password": "admin2024", "role": "Administrator"}
@@ -16,14 +16,14 @@ AEONOVX_TEAM = {
 
 # Custom welcome messages per team member
 USER_WELCOMES = {
-    "John Smith": "Welcome John! Ready to lead the dev team and tackle complex challenges? 🚀",
-    "Sarah Wilson": "Hi Sarah! Need help with design assets, mockups, or UI guidelines? 🎨",
-    "Mike Chen": "Hey Mike! Looking for API docs, database schemas, or backend solutions? ⚙️",
-    "Alex Johnson": "Welcome Alex! Frontend components, React docs, or styling guides? 💻",
-    "Maria Garcia": "Hi Maria! Project timelines, client requirements, or team coordination? 📊",
-    "David Brown": "Hey David! Deployment guides, server configs, or infrastructure docs? 🔧",
-    "Lisa Park": "Welcome Lisa! Testing procedures, bug reports, or quality standards? 🧪",
-    "Admin": "Welcome Admin! Full system access and team analytics available. 👑"
+    "Naveen": "Welcome Naveen!",
+    "Sharjan": "Hi Sarju!",
+    "Stephen": "Hey ste!",
+    "Albert": "Welcome Albert! ",
+    "Akhiljith": "Hi Akhil! ",
+    # "David Brown": "Hey David! Deployment guides, server configs, or infrastructure docs? 🔧",
+    # "Lisa Park": "Welcome Lisa! Testing procedures, bug reports, or quality standards? 🧪",
+    # "Admin": "Welcome Admin! Full system access and team analytics available."
 }
 
 # Helper functions for team management
