@@ -369,30 +369,13 @@ Generate a unique welcome message:"""
             max_tokens=80,
             top_p=0.9
         )
-        
-        ai_welcome = response.choices[0].message.content.strip()
-        return ai_welcome if ai_welcome else f"Welcome {name}! Great to have you on the AeonovX team! 🚀"
-        
-    except Exception as e:
-        logger.error(f"AI welcome generation failed: {e}")
-        role_welcomes = {
-            "Lead Developer": f"Welcome {name}! Ready to architect amazing solutions? 🚀",
-            "UI/UX Designer": f"Hi {name}! Time to create beautiful user experiences! 🎨",
-            "Backend Developer": f"Hey {name}! Let's build robust systems together! ⚙️",
-            "Frontend Developer": f"Welcome {name}! Ready to bring designs to life? 💻",
-            "Project Manager": f"Hi {name}! Let's keep projects on track and teams aligned! 📊",
-            "DevOps Engineer": f"Hey {name}! Infrastructure and deployments await! 🔧",
-            "QA Engineer": f"Welcome {name}! Quality and testing excellence ahead! 🧪",
-            "Administrator": f"Welcome {name}! Full system control at your fingertips! 👑"
-        }
-        return role_welcomes.get(role, f"Welcome {name}! Great to have you on the AeonovX team! 🚀")
 
 
 class iTethrBot:
-    """iTethr Bot - Enhanced with Phase 2: Intelligence & Memory"""
+    """iTethr Bot - Intelligence & Memory"""
     
     def __init__(self):
-        self.version = "8.0.0 - Phase 2"
+        self.version = "8.0.0"
         self.bot_name = "AeonovX iTethr Assistant"
         
         # Setup Groq API
@@ -601,7 +584,7 @@ class iTethrBot:
             if user_context:
                 context_summary = f"User context: {user_context}\n"
             
-            prompt = f"""You are the AeonovX iTethr Assistant, an expert on the iTethr platform with memory of past conversations.
+            prompt = f"""You are the AeonovX iTethr Assistant, an expert on the iTethr platform with memory of past conversations, And you are a good friend.
 
 USER CONTEXT:
 {context_summary}
@@ -820,7 +803,7 @@ def create_interface():
         # LOGIN SCREEN
         with gr.Column(visible=True) as login_screen:
             gr.Markdown("""
-            # 🏢 AeonovX iTethr Assistant - Phase 2
+            # iTethr Assistant
             **Enhanced with Intelligence & Memory - Authorized Personnel Required**
             
             *Phase 2 Features: Conversation Memory • Smart Suggestions • Context Awareness*
@@ -844,25 +827,25 @@ def create_interface():
         with gr.Column(visible=False) as bot_interface:
             # Header with team branding
             gr.Markdown(f"""
-            # 🚀 AeonovX iTethr Assistant - Phase 2
+            # iTethr Assistant
             **Enhanced Intelligence & Memory System - Powered by AeonovX**
             
             *AI responses with conversation memory and smart suggestions - v{bot.version}*
             """)
             
-            chatbot = gr.Chatbot(
-                height=450,
-                label="💬 Chat with Enhanced AeonovX Assistant",
-                show_copy_button=True,
-                avatar_images=("👤", "🤖")
-            )
+            # chatbot = gr.Chatbot(
+            #     height=450,
+            #     label="iTethr",
+            #     show_copy_button=True,
+            #     avatar_images=("👤", "🤖")
+            # )
             
             # Smart suggestions display
             suggestions_display = gr.HTML(label="Smart Suggestions")
             
             with gr.Row():
                 msg = gr.Textbox(
-                    placeholder="Ask me anything - I'll remember our conversation and provide smart suggestions...",
+                    placeholder="Chat with Me...",
                     label="",
                     scale=5,
                     max_lines=3
@@ -870,7 +853,7 @@ def create_interface():
                 send = gr.Button("Send ⚡", variant="primary", scale=1)
             
             # Quick suggestions with Phase 2 examples
-            gr.Markdown("### 💡 Try Phase 2 Features")
+            gr.Markdown("### QUICK SUGGESTIONS")
             with gr.Row():
                 btn1 = gr.Button("What is iTethr?", size="sm")
                 btn2 = gr.Button("Remember my questions?", size="sm")
@@ -882,13 +865,12 @@ def create_interface():
                 btn6 = gr.Button("Show my context", size="sm")
             
             gr.Markdown("""
-            ### ⚡ Phase 2: Enhanced Intelligence Features
+            ### Enhanced Intelligence Features
             
             **🧠 New Memory Capabilities:**
             • **Conversation History** – Remembers all your questions across sessions 💾
             • **Context Awareness** – Builds on previous conversations naturally 🔄
             • **User Preferences** – Tracks your interests and frequent topics 📊
-            • **Role Adaptation** – Personalizes responses based on your team role 👤
             
             **💡 Smart Suggestions Engine:**
             • **Follow-up Questions** – Suggests natural next steps after responses ➡️
