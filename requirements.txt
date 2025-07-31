@@ -15,3 +15,9 @@ fastapi
 # Utilities
 python-dotenv
 PyYAML
+
+# Phase 2: Memory and Intelligence Dependencies
+# Already included in standard library:
+# - pickle (for conversation memory persistence)
+# - collections (for defaultdict, deque)
+# - datetime (for timestamp tracking)
