@@ -756,12 +756,12 @@ def create_interface():
             # iTethr Assistant
             **Enhanced with Intelligence & Memory - Authorized Personnel Required**
             
-            *Phase 2 Features: Conversation Memory • Smart Suggestions • Context Awareness*
+            *Conversation Memory • Smart Suggestions • Context Awareness*
             """)
             
             name_input = gr.Textbox(
-                label="Full Name", 
-                placeholder="John Smith",
+                label="First Name", 
+                placeholder="John",
                 info="Enter your full name as registered in AeonovX team database"
             )
             password_input = gr.Textbox(
@@ -770,7 +770,7 @@ def create_interface():
                 placeholder="Enter your team password",
                 info="Use your assigned AeonovX team password"
             )
-            login_btn = gr.Button("🔐 Access AeonovX Assistant", variant="primary", size="lg")
+            login_btn = gr.Button("🔐 Access iTethr Assistant", variant="primary", size="lg")
         
         # BOT INTERFACE
         with gr.Column(visible=False) as bot_interface:

@@ -14,17 +14,17 @@ AEONOVX_TEAM = {
     # "Admin": {"password": "admin2024", "role": "Administrator"}
 }
 
-# Custom welcome messages per team member
-USER_WELCOMES = {
-    "Naveen": "Welcome Naveen!",
-    "Sharjan": "Hi Sarju!",
-    "Stephen": "Hey ste!",
-    "Albert": "Welcome Albert! ",
-    "Akhiljith": "Hi Akhil! ",
-    # "David Brown": "Hey David! Deployment guides, server configs, or infrastructure docs? 🔧",
-    # "Lisa Park": "Welcome Lisa! Testing procedures, bug reports, or quality standards? 🧪",
-    # "Admin": "Welcome Admin! Full system access and team analytics available."
-}
+# # Custom welcome messages per team member
+# USER_WELCOMES = {
+#     "Naveen": "Welcome Naveen!",
+#     "Sharjan": "Hi Sarju!",
+#     "Stephen": "Hey ste!",
+#     "Albert": "Welcome Albert! ",
+#     "Akhiljith": "Hi Akhil! ",
+#     # "David Brown": "Hey David! Deployment guides, server configs, or infrastructure docs? 🔧",
+#     # "Lisa Park": "Welcome Lisa! Testing procedures, bug reports, or quality standards? 🧪",
+#     # "Admin": "Welcome Admin! Full system access and team analytics available."
+# }
 
 # Helper functions for team management
 def add_team_member(name, password, role="Team Member"):
