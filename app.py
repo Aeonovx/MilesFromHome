@@ -816,14 +816,14 @@ def create_interface():
             
             gr.Markdown("""
             ### Enhanced Intelligence Features         
-            **🧠 New Memory Capabilities:**
-            • **User Preferences** – Tracks your interests and frequent topics 📊
+            ** New Memory Capabilities:**
+            • User Preferences – Tracks your interests and frequent topics 
             
-            **💡 Smart Suggestions Engine:**
-            • **Follow-up Questions** – Suggests natural next steps after responses ➡️
-            • **Domain-aware Recommendations** – Context-specific suggestions by topic 🎯
-            • **Related Documents** – Finds relevant docs automatically 📄
-            • **Role-based Suggestions** – Tailored to your responsibilities 👔
+            ** Smart Suggestions Engine:**
+            • **Follow-up Questions** – Suggests natural next steps after responses 
+            • **Domain-aware Recommendations** – Context-specific suggestions by topic 
+            • **Related Documents** – Finds relevant docs automatically 
+            • **Role-based Suggestions** – Tailored to your responsibilities 
             
             **🚀 Always Learning:**
             • Each conversation improves future interactions
