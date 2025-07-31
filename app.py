@@ -805,21 +805,18 @@ def create_interface():
             # Quick suggestions with Phase 2 examples
             gr.Markdown("### QUICK SUGGESTIONS")
             with gr.Row():
-                btn1 = gr.Button("What is iTethr?", size="sm")
-                btn2 = gr.Button("Remember my questions?", size="sm")
-                btn3 = gr.Button("Smart suggestions demo", size="sm")
+                btn1 = gr.Button("What is iTethr platform?", size="sm")
+                btn2 = gr.Button("Explain community plus?", size="sm")
+                btn3 = gr.Button("Compare Community plus and Hubs", size="sm")
             
             with gr.Row():
-                btn4 = gr.Button("Community structure?", size="sm")
-                btn5 = gr.Button("Authentication process?", size="sm")
-                btn6 = gr.Button("Show my context", size="sm")
+                btn4 = gr.Button("Explain iTethr Marketplace?", size="sm")
+                btn5 = gr.Button("How does iTethr authentication work?", size="sm")
+                btn6 = gr.Button("What is iFeed in iTethr?", size="sm")
             
             gr.Markdown("""
-            ### Enhanced Intelligence Features
-            
+            ### Enhanced Intelligence Features         
             **🧠 New Memory Capabilities:**
-            • **Conversation History** – Remembers all your questions across sessions 💾
-            • **Context Awareness** – Builds on previous conversations naturally 🔄
             • **User Preferences** – Tracks your interests and frequent topics 📊
             
             **💡 Smart Suggestions Engine:**
@@ -850,11 +847,11 @@ def create_interface():
             msg.submit(safe_chat, [msg, chatbot], [msg, chatbot, suggestions_display])
             
             btn1.click(lambda: "What is iTethr platform?", outputs=msg)
-            btn2.click(lambda: "Do you remember our previous conversations?", outputs=msg)
-            btn3.click(lambda: "Show me smart suggestions after this response", outputs=msg)
-            btn4.click(lambda: "Explain iTethr community structure", outputs=msg)
+            btn2.click(lambda: "Explain community plus?", outputs=msg)
+            btn3.click(lambda: "Compare Community plus and Hubs", outputs=msg)
+            btn4.click(lambda: "Explain iTethr Marketplace", outputs=msg)
             btn5.click(lambda: "How does iTethr authentication work?", outputs=msg)
-            btn6.click(lambda: "What context do you have about me?", outputs=msg)
+            btn6.click(lambda: "What is iFeed in iTethr?", outputs=msg)
         
         # Connect login with both inputs
         login_btn.click(
