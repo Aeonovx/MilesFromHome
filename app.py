@@ -725,37 +725,21 @@ Try asking about any of these topics! 🚀"""
 bot = iTethrBot()
 
 def authenticate(name, password):
-    """Authenticate AeonovX team members with AI-generated welcome"""
+    """Authenticate AeonovX team members"""
     
     if name in AEONOVX_TEAM and AEONOVX_TEAM[name]["password"] == password:
-        role = AEONOVX_TEAM[name]["role"]
-        
         # Set current user for memory tracking
         bot.set_current_user(name)
-        
-        # Generate AI welcome message
-        logger.info(f"Generating AI welcome for {name} ({role})")
-        ai_welcome = generate_ai_welcome(name, role)
-        
-        # Get user's conversation history summary
-        context_summary = bot.memory.get_conversation_summary(name)
-        
-        # Build personalized welcome
-        if context_summary != "New user":
-            full_welcome = f"🤖 **AI Assistant**: {ai_welcome}\n\n**Your Role:** {role}\n**Previous Context:** {context_summary}\n\n*Ready to continue helping with iTethr platform questions, building on our previous conversations!*"
-        else:
-            full_welcome = f"🤖 **AI Assistant**: {ai_welcome}\n\n**Your Role:** {role}\n**Access Level:** AeonovX Team Member\n\n*Ready to help with iTethr platform questions, project info, and team resources!*"
+        logger.info(f"✅ Authentication successful for {name}")
         
         return (
             gr.update(visible=False),  # Hide login
             gr.update(visible=True),   # Show bot
-            full_welcome
         )
     else:
         return (
             gr.update(visible=True),   # Keep login visible
             gr.update(visible=False),  # Hide bot
-            "❌ Invalid AeonovX credentials. Both name and password must be correct."
         )
 
 def create_interface():
@@ -787,7 +771,6 @@ def create_interface():
                 info="Use your assigned AeonovX team password"
             )
             login_btn = gr.Button("🔐 Access AeonovX Assistant", variant="primary", size="lg")
-            login_status = gr.Markdown("")
         
         # BOT INTERFACE
         with gr.Column(visible=False) as bot_interface:
@@ -799,12 +782,13 @@ def create_interface():
             *AI responses with conversation memory and smart suggestions - v{bot.version}*
             """)
             
-            # chatbot = gr.Chatbot(
-            #     height=450,
-            #     label="iTethr",
-            #     show_copy_button=True,
-            #     avatar_images=("👤", "🤖")
-            # )
+            # FIXED: Add the missing chatbot definition
+            chatbot = gr.Chatbot(
+                height=450,
+                label="iTethr Assistant",
+                show_copy_button=True,
+                avatar_images=("👤", "🤖")
+            )
             
             # Smart suggestions display
             suggestions_display = gr.HTML(label="Smart Suggestions")
@@ -876,7 +860,7 @@ def create_interface():
         login_btn.click(
             authenticate,
             [name_input, password_input],
-            [login_screen, bot_interface, login_status]
+            [login_screen, bot_interface]
         )
     
     # Health check with Phase 2 info
