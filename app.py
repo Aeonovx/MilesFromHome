@@ -337,40 +337,6 @@ class SmartSuggestionsEngine:
         return suggestions
 
 
-def generate_ai_welcome(name, role):
-    """Generate personalized AI welcome message using Groq"""
-    try:
-        groq_api_key = os.getenv('GROQ_API_KEY', '')
-        if not groq_api_key:
-            return f"Welcome {name}! Great to have you on the AeonovX team! 🚀"
-        
-        groq_client = Groq(api_key=groq_api_key)
-        
-        prompt = f"""Generate a personalized, friendly welcome message for {name} who is a {role} at AeonovX company. 
-
-Requirements:
-- Keep it under 50 words
-- Make it specific to their role and what they might need help with
-- Be professional but warm and encouraging
-- Include relevant emojis (1-2 max)
-- Mention they can ask about iTethr platform, projects, or team resources
-- Sound natural and conversational
-
-Name: {name}
-Role: {role}
-Company: AeonovX
-
-Generate a unique welcome message:"""
-
-        response = groq_client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="llama3-8b-8192",
-            temperature=0.8,
-            max_tokens=80,
-            top_p=0.9
-        )
-
-
 class iTethrBot:
     """iTethr Bot - Intelligence & Memory"""
     
