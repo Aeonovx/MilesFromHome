@@ -1,5 +1,5 @@
 # iTethr Bot - AeonovX Team Version with Phase 2: Intelligence & Memory + Production Slack
-# File: app.py - Complete production version
+# File: app.py - Complete production version (Corrected on 2025-08-01)
 
 import gradio as gr
 import os
@@ -347,7 +347,7 @@ class iTethrBot:
     """iTethr Bot - Intelligence & Memory with Production Slack Integration"""
     
     def __init__(self):
-        self.version = "9.0.0"
+        self.version = "9.0.1" # Version updated to reflect fixes
         self.bot_name = "AeonovX iBot Production"
         
         # Setup Groq API
@@ -698,11 +698,14 @@ Try asking about any of these topics! 🚀"""
         finally:
             self.current_user = original_user
     
-    def chat(self, message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[str, str]], str]:
-        """Chat function for Gradio with suggestions"""
+    # [FIX] Corrected chat method to match Gradio's `type="messages"` format
+    def chat(self, message: str, history: List[Dict[str, str]]) -> Tuple[str, List[Dict[str, str]], str]:
+        """Chat function for Gradio with suggestions, compatible with messages format."""
         if message.strip():
             response, suggestions = self.get_response(message)
-            history.append((message, response))
+            # Append user message and bot response as dictionaries
+            history.append({"role": "user", "content": message})
+            history.append({"role": "assistant", "content": response})
             
             # Format suggestions for display
             suggestions_html = self._format_suggestions(suggestions)
@@ -780,6 +783,7 @@ def authenticate(name, password):
             gr.update(visible=False),  # Hide bot
         )
 
+# [FIX] Corrected create_interface function with proper endpoint registration
 def create_interface():
     """Create Gradio interface with bulletproof Slack integration"""
     
@@ -812,7 +816,6 @@ def create_interface():
         
         # BOT INTERFACE
         with gr.Column(visible=False) as bot_interface:
-            # Header with team branding
             gr.Markdown(f"""
             # iBot - iTethr Assistant
             **Production Intelligence & Memory System - Powered by AeonovX**
@@ -825,10 +828,9 @@ def create_interface():
                 label="iBot",
                 show_copy_button=True,
                 avatar_images=("👤", "🤖"),
-                type="messages"
+                type="messages"  # This requires the history to be a list of dicts
             )
             
-            # Smart suggestions display
             suggestions_display = gr.HTML(label="Smart Suggestions")
             
             with gr.Row():
@@ -840,7 +842,6 @@ def create_interface():
                 )
                 send = gr.Button("Send ⚡", variant="primary", scale=1)
             
-            # Quick suggestions
             gr.Markdown("### QUICK SUGGESTIONS")
             with gr.Row():
                 btn1 = gr.Button("What is iTethr platform?", size="sm")
@@ -874,16 +875,17 @@ def create_interface():
             **Production-ready for the AeonovX team** - Your reliable AI assistant!
             """)
             
+            # [FIX] Corrected safe_chat function to handle the new message format
             def safe_chat(message, history):
                 try:
                     return bot.chat(message, history)
                 except Exception as e:
                     logger.error(f"Chat error: {e}")
                     if message.strip():
-                        history.append((message, f"Sorry, I encountered an error: {str(e)}"))
+                        history.append({"role": "user", "content": message})
+                        history.append({"role": "assistant", "content": f"Sorry, I encountered an error: {str(e)}"})
                     return "", history, ""
             
-            # Connect events
             send.click(safe_chat, [msg, chatbot], [msg, chatbot, suggestions_display])
             msg.submit(safe_chat, [msg, chatbot], [msg, chatbot, suggestions_display])
             
@@ -894,147 +896,113 @@ def create_interface():
             btn5.click(lambda: "How does iTethr authentication work?", outputs=msg)
             btn6.click(lambda: "What is iFeed in iTethr?", outputs=msg)
         
-        # Connect login
         login_btn.click(
             authenticate,
             [name_input, password_input],
             [login_screen, bot_interface]
         )
+
+        # [FIX] FastAPI endpoints are now correctly defined *inside* the `with gr.Blocks` context
+        from fastapi import Request, HTTPException
+        from fastapi.responses import JSONResponse
     
-    # PRODUCTION SLACK ENDPOINTS - Bulletproof implementation
-    from fastapi import Request, HTTPException
-    from fastapi.responses import JSONResponse
+        @interface.app.get("/slack/ping")
+        async def slack_ping():
+            """Test endpoint to verify Slack integration is working"""
+            return JSONResponse({
+                "status": "iBot Slack endpoint working",
+                "timestamp": datetime.now().isoformat(),
+                "version": bot.version,
+                "service": "production-slack-integration"
+            })
     
-    @interface.app.get("/slack/ping")
-    async def slack_ping():
-        """Test endpoint to verify Slack integration is working"""
-        return JSONResponse({
-            "status": "iBot Slack endpoint working",
-            "timestamp": datetime.now().isoformat(),
-            "version": bot.version,
-            "service": "production-slack-integration"
-        })
-    
-    @interface.app.post("/slack/events")
-    async def slack_events_production(request: Request):
-        """Production Slack events handler - Bulletproof for 24/7 use"""
-        try:
-            # Get raw request body
-            body = await request.body()
-            body_str = body.decode('utf-8')
-            
-            # Log incoming request for debugging
-            logger.info(f"Slack request received: {len(body_str)} bytes")
-            
-            # Parse JSON safely
+        @interface.app.post("/slack/events")
+        async def slack_events_production(request: Request):
+            """Production Slack events handler - Bulletproof for 24/7 use"""
             try:
-                data = json.loads(body_str)
-            except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON from Slack: {e}")
-                return JSONResponse({"error": "Invalid JSON"}, status_code=400)
-            
-            # Handle URL verification challenge - CRITICAL FOR SETUP
-            if data.get("type") == "url_verification":
-                challenge = data.get("challenge", "")
-                logger.info(f"✅ Slack URL verification challenge: {challenge}")
-                return JSONResponse({"challenge": challenge})
-            
-            # Handle actual message events
-            if data.get("type") == "event_callback":
-                event = data.get("event", {})
+                body = await request.body()
+                body_str = body.decode('utf-8')
+                logger.info(f"Slack request received: {len(body_str)} bytes")
                 
-                # Only process actual messages (not bot messages)
-                if (event.get("type") == "message" and 
-                    not event.get("bot_id") and 
-                    event.get("text") and
-                    event.get("user")):
+                try:
+                    data = json.loads(body_str)
+                except json.JSONDecodeError as e:
+                    logger.error(f"Invalid JSON from Slack: {e}")
+                    return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+                
+                if data.get("type") == "url_verification":
+                    challenge = data.get("challenge", "")
+                    logger.info(f"✅ Slack URL verification challenge: {challenge}")
+                    return JSONResponse({"challenge": challenge})
+                
+                if data.get("type") == "event_callback":
+                    event = data.get("event", {})
                     
-                    text = event.get("text", "").strip()
-                    user_id = event.get("user", "")
-                    channel = event.get("channel", "")
-                    original_text = text
-                    
-                    # Determine if we should respond
-                    should_respond = False
-                    
-                    # Respond to direct messages
-                    if event.get("channel_type") == "im":
-                        should_respond = True
-                        logger.info(f"Direct message from user {user_id}")
-                    
-                    # Respond to "ibot" mentions in channels
-                    elif "ibot" in text.lower():
-                        should_respond = True
-                        # Clean the message
-                        text = text.lower().replace("ibot", "").strip()
-                        logger.info(f"iBot mention in channel from user {user_id}")
-                    
-                    if should_respond and text:
-                        logger.info(f"Processing message: {text[:50]}...")
+                    if (event.get("type") == "message" and 
+                        not event.get("bot_id") and 
+                        event.get("text") and
+                        event.get("user")):
                         
-                        try:
-                            # Get bot response
-                            response = bot.get_slack_response(text, user_id)
-                            
-                            # Send response back to Slack
-                            success = send_slack_message(channel, response)
-                            
-                            if success:
-                                logger.info("✅ Response sent to Slack successfully")
-                                
-                                # Notify about Slack chat activity
-                                try:
-                                    notify_slack_chat(user_id, original_text, response)
-                                except Exception as e:
-                                    logger.error(f"Slack notification error: {e}")
-                            else:
-                                logger.error("❌ Failed to send response to Slack")
-                                
-                        except Exception as e:
-                            logger.error(f"Error processing Slack message: {e}")
-                            # Send error message to user
+                        text = event.get("text", "").strip()
+                        user_id = event.get("user", "")
+                        channel = event.get("channel", "")
+                        original_text = text
+                        
+                        should_respond = False
+                        if event.get("channel_type") == "im":
+                            should_respond = True
+                            logger.info(f"Direct message from user {user_id}")
+                        elif "ibot" in text.lower():
+                            should_respond = True
+                            text = text.lower().replace("ibot", "").strip()
+                            logger.info(f"iBot mention in channel from user {user_id}")
+                        
+                        if should_respond and text:
+                            logger.info(f"Processing message: {text[:50]}...")
                             try:
-                                send_slack_message(channel, "Sorry, I encountered an error processing your message. Please try again.")
-                            except:
-                                pass
-            
-            # Always return success to Slack
-            return JSONResponse({"status": "ok"})
-            
-        except Exception as e:
-            logger.error(f"Critical Slack endpoint error: {e}")
-            return JSONResponse({"error": "Internal server error"}, status_code=500)
+                                response = bot.get_slack_response(text, user_id)
+                                success = send_slack_message(channel, response)
+                                if success:
+                                    logger.info("✅ Response sent to Slack successfully")
+                                    try:
+                                        notify_slack_chat(user_id, original_text, response)
+                                    except Exception as e:
+                                        logger.error(f"Slack notification error: {e}")
+                                else:
+                                    logger.error("❌ Failed to send response to Slack")
+                            except Exception as e:
+                                logger.error(f"Error processing Slack message: {e}")
+                                try:
+                                    send_slack_message(channel, "Sorry, I encountered an error processing your message. Please try again.")
+                                except: pass
+                
+                return JSONResponse({"status": "ok"})
+            except Exception as e:
+                logger.error(f"Critical Slack endpoint error: {e}")
+                return JSONResponse({"error": "Internal server error"}, status_code=500)
     
-    # Health check endpoint
-    @interface.app.get("/health")
-    async def health_check():
-        return JSONResponse(content={
-            "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
-            "service": "aeonovx-ibot-production",
-            "version": bot.version,
-            "type": "production_single_app",
-            "documents_loaded": len(bot.documents),
-            "groq_api_configured": bool(bot.groq_api_key),
-            "slack_webhook_configured": bool(os.getenv('SLACK_WEBHOOK_URL')),
-            "slack_bot_configured": bool(os.getenv('SLACK_BOT_TOKEN')),
-            "team_members_active": len(AEONOVX_TEAM),
-            "features": [
-                "ai_welcome", 
-                "semantic_search", 
-                "team_auth",
-                "conversation_memory",
-                "smart_suggestions",
-                "context_awareness",
-                "user_preferences",
-                "production_slack_integration",
-                "24_7_uptime",
-                "ibot_trigger"
-            ],
-            "memory_users": len(bot.memory.user_conversations),
-            "total_conversations": sum(len(convs) for convs in bot.memory.user_conversations.values()),
-            "slack_integration": "production_ready"
-        }, status_code=200)
+        @interface.app.get("/health")
+        async def health_check():
+            return JSONResponse(content={
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "service": "aeonovx-ibot-production",
+                "version": bot.version,
+                "type": "production_single_app",
+                "documents_loaded": len(bot.documents),
+                "groq_api_configured": bool(bot.groq_api_key),
+                "slack_webhook_configured": bool(os.getenv('SLACK_WEBHOOK_URL')),
+                "slack_bot_configured": bool(os.getenv('SLACK_BOT_TOKEN')),
+                "team_members_active": len(AEONOVX_TEAM),
+                "features": [
+                    "ai_welcome", "semantic_search", "team_auth", "conversation_memory",
+                    "smart_suggestions", "context_awareness", "user_preferences",
+                    "production_slack_integration", "24_7_uptime", "ibot_trigger"
+                ],
+                "memory_users": len(bot.memory.user_conversations),
+                "total_conversations": sum(len(convs) for convs in bot.memory.user_conversations.values()),
+                "slack_integration": "production_ready"
+            }, status_code=200)
     
     return interface
 
@@ -1044,7 +1012,6 @@ def setup_railway_config():
     logger.info(f"🔌 Using port: {port}")
     return port
 
-# Graceful shutdown with memory save
 def signal_handler(sig, frame):
     logger.info('🛑 Shutting down AeonovX iBot Production...')
     if bot and bot.memory:
@@ -1066,7 +1033,6 @@ if __name__ == "__main__":
         logger.info(f"🤖 Slack bot: {'Enabled' if os.getenv('SLACK_BOT_TOKEN') else 'Disabled'}")
         logger.info(f"🔧 Production mode: 24/7 ready")
         
-        # Notify Slack that production bot is starting
         try:
             notify_startup()
         except Exception as e:
@@ -1086,7 +1052,6 @@ if __name__ == "__main__":
         )
     except Exception as e:
         logger.error(f"Failed to start: {e}")
-        # Notify Slack of startup errors
         try:
             notify_error(f"Production bot failed to start: {e}")
         except:
