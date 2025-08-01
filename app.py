@@ -20,6 +20,9 @@ from team_manager import AEONOVX_TEAM
 import pickle
 from collections import defaultdict, deque
 
+# Import Slack integration
+from slack_integration import notify_startup, notify_login, notify_question, notify_error
+
 # Load environment variables
 try:
     from dotenv import load_dotenv
@@ -609,7 +612,7 @@ ANSWER:"""
             return "I can help you with iTethr platform features, communities, authentication, and more. Try asking about specific topics like 'What is iTethr?' or 'How do communities work?'"
     
     def get_response(self, message: str) -> Tuple[str, List[Dict[str, str]]]:
-        """Get response from bot with smart suggestions"""
+        """Get response from bot with smart suggestions and Slack integration"""
         start_time = time.time()
         self.total_questions += 1
         
@@ -659,6 +662,13 @@ Try asking about any of these topics! 🚀"""
             # Save conversation to memory
             if self.current_user:
                 self.memory.add_conversation(self.current_user, message, response, topics)
+
+        # Send important interactions to Slack
+        if self.current_user and len(message) > 10:  # Only send meaningful questions
+            try:
+                notify_question(self.current_user, message)
+            except Exception as e:
+                logger.error(f"Slack notification failed: {e}")
         
         # Log response time
         response_time = time.time() - start_time
@@ -731,6 +741,12 @@ def authenticate(name, password):
         # Set current user for memory tracking
         bot.set_current_user(name)
         logger.info(f"✅ Authentication successful for {name}")
+        
+        # Notify Slack of team member login
+        try:
+            notify_login(name, AEONOVX_TEAM[name]['role'])
+        except Exception as e:
+            logger.error(f"Slack notification failed: {e}")
         
         return (
             gr.update(visible=False),  # Hide login
@@ -880,7 +896,8 @@ def create_interface():
                 "conversation_memory",
                 "smart_suggestions",
                 "context_awareness",
-                "user_preferences"
+                "user_preferences",
+                "slack_integration"
             ],
             "memory_users": len(bot.memory.user_conversations),
             "total_conversations": sum(len(convs) for convs in bot.memory.user_conversations.values())
@@ -912,6 +929,13 @@ if __name__ == "__main__":
         logger.info(f"🧠 Memory system: Enabled")
         logger.info(f"💡 Smart suggestions: Enabled")
         logger.info(f"🤖 AI welcome messages: {'Enabled' if os.getenv('GROQ_API_KEY') else 'Disabled (fallback)'}")
+        logger.info(f"📱 Slack integration: {'Enabled' if os.getenv('SLACK_WEBHOOK_URL') else 'Disabled'}")
+        
+        # Notify Slack that bot is starting
+        try:
+            notify_startup()
+        except Exception as e:
+            logger.error(f"Slack notification failed: {e}")
         
         interface = create_interface()
         port = setup_railway_config()
@@ -927,4 +951,9 @@ if __name__ == "__main__":
         )
     except Exception as e:
         logger.error(f"Failed to start: {e}")
+        # Notify Slack of startup errors
+        try:
+            notify_error(f"Bot failed to start: {e}")
+        except:
+            pass  # Don't let Slack errors prevent logging
         sys.exit(1)

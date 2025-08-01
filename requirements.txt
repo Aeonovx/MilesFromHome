@@ -15,6 +15,7 @@ fastapi
 # Utilities
 python-dotenv
 PyYAML
+requests
 
 # Phase 2: Memory and Intelligence Dependencies
 # Already included in standard library:
