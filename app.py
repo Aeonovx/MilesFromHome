@@ -347,7 +347,7 @@ class iTethrBot:
     """iTethr Bot - Intelligence & Memory with Production Slack Integration"""
     
     def __init__(self):
-        self.version = "9.0.1" # Version updated to reflect fixes
+        self.version = "9.0.2" # Version updated to reflect fixes
         self.bot_name = "AeonovX iBot Production"
         
         # Setup Groq API
@@ -698,19 +698,22 @@ Try asking about any of these topics! 🚀"""
         finally:
             self.current_user = original_user
     
-    # [FIX] Corrected chat method to match Gradio's `type="messages"` format
     def chat(self, message: str, history: List[Dict[str, str]]) -> Tuple[str, List[Dict[str, str]], str]:
         """Chat function for Gradio with suggestions, compatible with messages format."""
-        if message.strip():
-            response, suggestions = self.get_response(message)
-            # Append user message and bot response as dictionaries
-            history.append({"role": "user", "content": message})
-            history.append({"role": "assistant", "content": response})
-            
-            # Format suggestions for display
-            suggestions_html = self._format_suggestions(suggestions)
-            return "", history, suggestions_html
-        return "", history, ""
+        if not message.strip():
+            return "", history, ""
+
+        # Create a new list for history to avoid modifying the original in place
+        new_history = list(history or [])
+
+        response, suggestions = self.get_response(message)
+        
+        new_history.append({"role": "user", "content": message})
+        new_history.append({"role": "assistant", "content": response})
+        
+        suggestions_html = self._format_suggestions(suggestions)
+        
+        return "", new_history, suggestions_html
     
     def _format_suggestions(self, suggestions: List[Dict[str, str]]) -> str:
         """Format suggestions as HTML"""
@@ -783,7 +786,7 @@ def authenticate(name, password):
             gr.update(visible=False),  # Hide bot
         )
 
-# [FIX] Corrected create_interface function with proper endpoint registration
+# [FIX] Corrected create_interface function with gr.State for robust history management
 def create_interface():
     """Create Gradio interface with bulletproof Slack integration"""
     
@@ -828,8 +831,11 @@ def create_interface():
                 label="iBot",
                 show_copy_button=True,
                 avatar_images=("👤", "🤖"),
-                type="messages"  # This requires the history to be a list of dicts
+                type="messages"
             )
+            
+            # [FIX] Add gr.State to manage history reliably
+            history_state = gr.State([])
             
             suggestions_display = gr.HTML(label="Smart Suggestions")
             
@@ -875,19 +881,33 @@ def create_interface():
             **Production-ready for the AeonovX team** - Your reliable AI assistant!
             """)
             
-            # [FIX] Corrected safe_chat function to handle the new message format
+            # [FIX] Update safe_chat to use the new history_state
             def safe_chat(message, history):
                 try:
+                    # Pass the history from the state component to the bot
                     return bot.chat(message, history)
                 except Exception as e:
                     logger.error(f"Chat error: {e}")
                     if message.strip():
+                        # Ensure history is a list before appending
+                        history = list(history or [])
                         history.append({"role": "user", "content": message})
                         history.append({"role": "assistant", "content": f"Sorry, I encountered an error: {str(e)}"})
                     return "", history, ""
-            
-            send.click(safe_chat, [msg, chatbot], [msg, chatbot, suggestions_display])
-            msg.submit(safe_chat, [msg, chatbot], [msg, chatbot, suggestions_display])
+
+            # [FIX] Update event handlers to use history_state
+            # Inputs: msg (Textbox), history_state (State)
+            # Outputs: msg (Textbox), chatbot (Chatbot), history_state (State), suggestions_display (HTML)
+            send.click(
+                safe_chat, 
+                [msg, history_state], 
+                [msg, chatbot, history_state, suggestions_display]
+            )
+            msg.submit(
+                safe_chat, 
+                [msg, history_state], 
+                [msg, chatbot, history_state, suggestions_display]
+            )
             
             btn1.click(lambda: "What is iTethr platform?", outputs=msg)
             btn2.click(lambda: "Explain community plus?", outputs=msg)
@@ -902,7 +922,6 @@ def create_interface():
             [login_screen, bot_interface]
         )
 
-        # [FIX] FastAPI endpoints are now correctly defined *inside* the `with gr.Blocks` context
         from fastapi import Request, HTTPException
         from fastapi.responses import JSONResponse
     
