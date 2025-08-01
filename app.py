@@ -347,8 +347,8 @@ class iTethrBot:
     """iTethr Bot - Intelligence & Memory with Slack Integration"""
     
     def __init__(self):
-        self.version = "8.1.0"
-        self.bot_name = "AeonovX iTethr Assistant"
+        self.version = "8.2.0"
+        self.bot_name = "AeonovX iBot"
         
         # Setup Groq API
         self.groq_api_key = os.getenv('GROQ_API_KEY', '')
@@ -556,7 +556,7 @@ class iTethrBot:
             if user_context:
                 context_summary = f"User context: {user_context}\n"
             
-            prompt = f"""You are the AeonovX iTethr Assistant, an expert on the iTethr platform with memory of past conversations, And you are a good friend.
+            prompt = f"""You are iBot, the AeonovX iTethr Assistant, an expert on the iTethr platform with memory of past conversations. You are a helpful AI assistant and good friend.
 
 USER CONTEXT:
 {context_summary}
@@ -573,7 +573,7 @@ INSTRUCTIONS:
 - If the documentation doesn't contain the answer, say "I don't have that specific information in the iTethr documentation"
 - Keep responses focused and under 300 words
 - Be friendly and use a helpful tone
-- You are built by AeonovX team for internal use
+- You are iBot, built by AeonovX team for internal use
 
 ANSWER:"""
 
@@ -781,17 +781,17 @@ def authenticate(name, password):
         )
 
 def create_interface():
-    """Create Gradio interface with Phase 2 features"""
+    """Create Gradio interface with Phase 2 features and fixed Slack integration"""
     
     with gr.Blocks(
-        title="AeonovX iTethr Assistant",
+        title="AeonovX iBot",
         theme=gr.themes.Soft(primary_hue="blue")
     ) as interface:
         
         # LOGIN SCREEN
         with gr.Column(visible=True) as login_screen:
             gr.Markdown("""
-            # iTethr Assistant
+            # iBot - iTethr Assistant
             **Enhanced with Intelligence & Memory - Authorized Personnel Required**
             
             *Conversation Memory • Smart Suggestions • Context Awareness • Slack Integration*
@@ -808,24 +808,24 @@ def create_interface():
                 placeholder="Enter your team password",
                 info="Use your assigned AeonovX team password"
             )
-            login_btn = gr.Button("🔐 Access iTethr Assistant", variant="primary", size="lg")
+            login_btn = gr.Button("🔐 Access iBot", variant="primary", size="lg")
         
         # BOT INTERFACE
         with gr.Column(visible=False) as bot_interface:
             # Header with team branding
             gr.Markdown(f"""
-            # iTethr Assistant
+            # iBot - iTethr Assistant
             **Enhanced Intelligence & Memory System - Powered by AeonovX**
             
             *AI responses with conversation memory and smart suggestions - v{bot.version}*
             """)
             
-            # FIXED: Add the missing chatbot definition
             chatbot = gr.Chatbot(
                 height=450,
-                label="iTethr Assistant",
+                label="iBot",
                 show_copy_button=True,
-                avatar_images=("👤", "🤖")
+                avatar_images=("👤", "🤖"),
+                type="messages"
             )
             
             # Smart suggestions display
@@ -833,7 +833,7 @@ def create_interface():
             
             with gr.Row():
                 msg = gr.Textbox(
-                    placeholder="Chat with Me...",
+                    placeholder="Chat with iBot...",
                     label="",
                     scale=5,
                     max_lines=3
@@ -864,9 +864,9 @@ def create_interface():
             • **Role-based Suggestions** – Tailored to your responsibilities 
             
             **📱 Slack Integration:**
-            • Chat with the bot directly in Slack channels
-            • Mention @iTethr Assistant to get responses
-            • Receive notifications about bot activity
+            • Type "ibot your question" in any Slack channel
+            • Direct message iBot in Slack
+            • Get the same intelligent responses
             
             **🚀 Always Learning:**
             • Each conversation improves future interactions
@@ -903,13 +903,13 @@ def create_interface():
             [login_screen, bot_interface]
         )
     
-    # Slack Events API endpoint
+    # FIXED SLACK ENDPOINTS - Properly registered outside Gradio context
+    from fastapi import Request
+    from fastapi.responses import JSONResponse
+    
     @interface.app.post("/slack/events")
-    async def slack_events(request):
-        """Handle Slack events"""
-        from fastapi import Request
-        import json
-        
+    async def handle_slack_events(request: Request):
+        """Handle Slack events with proper error handling"""
         try:
             body = await request.body()
             body_str = body.decode('utf-8')
@@ -917,59 +917,70 @@ def create_interface():
             
             # Handle URL verification challenge
             if data.get("type") == "url_verification":
-                return {"challenge": data.get("challenge")}
+                challenge = data.get("challenge")
+                logger.info(f"✅ Slack challenge received: {challenge}")
+                return JSONResponse({"challenge": challenge})
             
-            # Handle actual events
+            # Handle message events
             if data.get("type") == "event_callback":
                 event = data.get("event", {})
                 
-                # Only respond to messages, not bot messages
                 if (event.get("type") == "message" and 
                     not event.get("bot_id") and 
                     event.get("text")):
                     
-                    # Extract event information
-                    user_info = extract_user_info(event)
-                    if user_info and user_info['message']:
+                    text = event.get("text", "").strip().lower()
+                    
+                    # Respond to "ibot" or direct messages
+                    should_respond = (
+                        event.get("channel_type") == "im" or 
+                        "ibot" in text
+                    )
+                    
+                    if should_respond:
+                        user_id = event.get('user', '')
+                        channel = event.get('channel', '')
+                        message = event.get('text', '')
                         
-                        # Get bot response
-                        response = bot.get_slack_response(
-                            user_info['message'], 
-                            user_info['user_id']
-                        )
+                        # Remove "ibot" from message if present
+                        if "ibot" in message.lower():
+                            message = message.lower().replace("ibot", "").strip()
                         
-                        # Send response back to Slack
-                        success = send_slack_message(
-                            user_info['channel'], 
-                            response,
-                            user_info['timestamp']
-                        )
-                        
-                        if success:
-                            # Notify about Slack chat activity
-                            try:
-                                notify_slack_chat(
-                                    user_info['user_id'],
-                                    user_info['message'],
-                                    response
-                                )
-                            except Exception as e:
-                                logger.error(f"Slack notification error: {e}")
+                        if message:
+                            # Get bot response
+                            response = bot.get_slack_response(message, user_id)
+                            
+                            # Send response back to Slack
+                            success = send_slack_message(channel, response)
+                            
+                            if success:
+                                # Log Slack chat activity
+                                try:
+                                    notify_slack_chat(user_id, message, response)
+                                except Exception as e:
+                                    logger.error(f"Slack notification error: {e}")
             
-            return {"status": "ok"}
+            return JSONResponse({"status": "ok"})
             
         except Exception as e:
             logger.error(f"Slack event error: {e}")
-            return {"error": "Internal server error"}, 500
+            return JSONResponse({"error": "Internal server error"}, status_code=500)
     
-    # Health check with Phase 2 info
+    @interface.app.get("/slack/test")
+    async def slack_test():
+        return JSONResponse({
+            "status": "iBot Slack endpoint working", 
+            "timestamp": datetime.now().isoformat(),
+            "version": bot.version
+        })
+    
+    # Health check endpoint
     @interface.app.get("/health")
     async def health_check():
-        from fastapi.responses import JSONResponse
         return JSONResponse(content={
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
-            "service": "aeonovx-itethr-assistant",
+            "service": "aeonovx-ibot",
             "version": bot.version,
             "phase": "2 - Intelligence & Memory + Slack Bot",
             "documents_loaded": len(bot.documents),
@@ -986,7 +997,8 @@ def create_interface():
                 "context_awareness",
                 "user_preferences",
                 "slack_integration",
-                "slack_bot_chat"
+                "slack_bot_chat",
+                "ibot_trigger"
             ],
             "memory_users": len(bot.memory.user_conversations),
             "total_conversations": sum(len(convs) for convs in bot.memory.user_conversations.values())
@@ -1002,7 +1014,7 @@ def setup_railway_config():
 
 # Graceful shutdown with memory save
 def signal_handler(sig, frame):
-    logger.info('🛑 Shutting down AeonovX Assistant...')
+    logger.info('🛑 Shutting down AeonovX iBot...')
     if bot and bot.memory:
         bot.memory._save_memory()
         logger.info('💾 Conversation memory saved')

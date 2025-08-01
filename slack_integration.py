@@ -1,4 +1,4 @@
-# Enhanced Slack Integration with Two-way Chat
+# Slack Integration Module with ibot trigger
 # File: slack_integration.py
 
 import requests
@@ -60,7 +60,7 @@ def send_slack_message(channel, message, thread_ts=None):
         payload = {
             "channel": channel,
             "text": message,
-            "username": "iTethr Assistant",
+            "username": "iBot",
             "icon_emoji": ":robot_face:"
         }
         
@@ -114,8 +114,12 @@ def extract_user_info(event):
         text = event.get('text', '').strip()
         ts = event.get('ts', '')
         
-        # Remove bot mention from text
-        text = text.replace('<@U07KH0JLN0F>', '').strip()  # Replace with your bot's user ID
+        # Remove bot mention from text and check for ibot trigger
+        text = text.replace('<@A098WUDF1QR>', '').strip()  # Replace with your actual bot user ID
+        
+        # Check if message starts with "ibot" (case insensitive)
+        if text.lower().startswith('ibot'):
+            text = text[4:].strip()  # Remove "ibot" and get the rest
         
         return {
             'user_id': user_id,
@@ -130,7 +134,7 @@ def extract_user_info(event):
 def notify_startup():
     """Notify Slack that bot is starting"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    message = f"🚀 *iTethr Bot Started Successfully!*\n⏰ Time: {timestamp}\n🏢 AeonovX Team Ready\n💬 You can now chat with me in Slack!"
+    message = f"🚀 *iBot Started Successfully!*\n⏰ Time: {timestamp}\n🏢 AeonovX Team Ready\n💬 Type 'ibot' + your question to chat with me!"
     return send_to_slack(message)
 
 def notify_login(name, role):
@@ -142,7 +146,7 @@ def notify_login(name, role):
 def notify_question(user, question):
     """Notify Slack when user asks a question"""
     truncated_question = question[:100] + "..." if len(question) > 100 else question
-    message = f"🤖 *Bot Activity*\n👤 User: {user}\n❓ Question: {truncated_question}\n💡 Response sent"
+    message = f"🤖 *iBot Activity*\n👤 User: {user}\n❓ Question: {truncated_question}\n💡 Response sent"
     return send_to_slack(message)
 
 def notify_error(error_message):
@@ -153,13 +157,23 @@ def notify_error(error_message):
 
 def notify_slack_chat(user_id, question, response):
     """Notify about Slack chat activity"""
-    message = f"💬 *Slack Chat Activity*\n👤 User: <@{user_id}>\n❓ Question: {question[:50]}...\n✅ Responded in Slack"
+    message = f"💬 *iBot Slack Chat*\n👤 User: <@{user_id}>\n❓ Question: {question[:50]}...\n✅ Responded in Slack"
+    return send_to_slack(message)
+
+def notify_daily_stats(stats):
+    """Send daily statistics to Slack"""
+    message = f"📊 *Daily iBot Statistics*\n{stats}"
+    return send_to_slack(message)
+
+def notify_custom(title, details, emoji="ℹ️"):
+    """Send custom notification to Slack"""
+    message = f"{emoji} *{title}*\n{details}"
     return send_to_slack(message)
 
 # Quick test function
 def test_slack_connection():
     """Test if Slack webhook is working"""
-    test_message = "🧪 Testing Slack integration from iTethr Bot"
+    test_message = "🧪 Testing iBot Slack integration"
     result = send_to_slack(test_message)
     if result:
         print("✅ Slack integration working!")
