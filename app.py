@@ -6,7 +6,6 @@ from collections import Counter
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from apscheduler.schedulers.background import BackgroundScheduler
 import feedparser
 from groq import Groq
 from dotenv import load_dotenv
@@ -37,7 +36,6 @@ NEWS_FEEDS = {
 
 # Refined categorization with stronger, more specific keywords
 TECH_KEYWORDS = {
-    # High-value tech keywords (weight 5)
     "high_value": [
         "artificial intelligence", "machine learning", "chatgpt", "openai", "ai model", 
         "cryptocurrency", "bitcoin", "ethereum", "blockchain", "crypto", "nft",
@@ -50,14 +48,12 @@ TECH_KEYWORDS = {
         "social media", "facebook", "twitter", "instagram", "tiktok", "youtube",
         "streaming", "netflix", "spotify", "gaming", "video game", "esports"
     ],
-    # Medium-value tech keywords (weight 3)
     "medium_value": [
         "apple", "google", "microsoft", "amazon", "meta", "nvidia", "intel", "amd",
         "tech", "technology", "digital", "online", "internet", "website", "platform",
         "mobile", "computer", "laptop", "device", "gadget", "innovation",
         "robot", "automation", "drone", "virtual reality", "vr", "ar", "metaverse"
     ],
-    # Low-value tech keywords (weight 1) - only count if multiple present
     "low_value": [
         "data", "network", "system", "electronic", "digital", "smart", "tech"
     ]
@@ -290,7 +286,7 @@ def explain_with_ai(summary):
                 }
             ], 
             model="llama3-8b-8192",
-            max_tokens=800,  # Increased from 200 to 800 for longer explanations
+            max_tokens=800,
             temperature=float(os.environ.get("TEMPERATURE", 0.01))
         )
         return chat_completion.choices[0].message.content
@@ -303,7 +299,7 @@ def fetch_and_process_news():
     processed_news = []
     article_id = 0
     
-    print(f"🚀 Starting refined news fetch at {datetime.now()}")
+    print(f"🚀 Starting cron news fetch at {datetime.now()}")
     
     for source, url in NEWS_FEEDS.items():
         try:
@@ -367,20 +363,38 @@ def fetch_and_process_news():
                 "last_updated": datetime.utcnow().isoformat()
             }, f, indent=4)
         
-        print(f"✅ Refined news processing complete! {len(processed_news)} articles saved.")
+        print(f"✅ Cron news processing complete! {len(processed_news)} articles saved.")
         
     except Exception as e:
         print(f"❌ Error saving news file: {e}")
 
-# --- API Endpoints ---
-@app.on_event("startup")
-def start_scheduler():
-    scheduler = BackgroundScheduler(timezone="UTC")
-    fetch_and_process_news()
-    scheduler.add_job(fetch_and_process_news, 'interval', minutes=30)
-    scheduler.start()
-    print("🔄 Refined scheduler started - news will update every 30 minutes")
+# --- RAILWAY CRON ENDPOINT ---
+@app.get("/cron/fetch-news")
+async def cron_fetch_news():
+    """Endpoint for Railway Cron to trigger news fetching"""
+    try:
+        fetch_and_process_news()
+        return {
+            "status": "success",
+            "message": "News fetched and processed successfully",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        print(f"❌ Cron fetch error: {e}")
+        return {
+            "status": "error", 
+            "message": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
+# --- STARTUP: Initial news fetch ---
+@app.on_event("startup")
+async def startup_event():
+    """Fetch news once on startup"""
+    print("🔄 App starting up - fetching initial news...")
+    fetch_and_process_news()
+
+# --- API Endpoints ---
 @app.get("/api/news")
 async def get_news(search: str = None, category: str = None):
     if not os.path.exists(NEWS_FILE): 

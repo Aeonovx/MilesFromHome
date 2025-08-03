@@ -1,6 +1,6 @@
 fastapi
 uvicorn
 feedparser
-apscheduler
 groq
 python-dotenv
+python-multipart
