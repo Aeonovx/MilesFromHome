@@ -25,10 +25,31 @@ function fetchArticle(id) {
 function renderArticle(article) {
     document.title = `${article.headline} | MilesFromHome`;
     const container = document.getElementById('article-container');
-    const imageUrl = article.image_url || `https://via.placeholder.com/800x400/161b22/8b949e?text=MilesFromHome`;
+    
+    // Enhanced image handling for article page
+    let imageUrl = article.image_url;
+    
+    if (!imageUrl || imageUrl.trim() === '') {
+        const sourceColors = {
+            "Reuters": "2e5266",
+            "BBC News": "bb1919", 
+            "The Guardian": "052962",
+            "TechCrunch": "00d084",
+            "Associated Press": "0066cc"
+        };
+        
+        const color = sourceColors[article.source] || "1a1f26";
+        const encodedSource = encodeURIComponent(article.source);
+        imageUrl = `https://via.placeholder.com/800x400/${color}/ffffff?text=${encodedSource}`;
+    }
 
     container.innerHTML = `
-        <img src="${imageUrl}" alt="${article.headline}" class="article-image">
+        <div class="article-image-container">
+            <img src="${imageUrl}" 
+                 alt="${article.headline}" 
+                 class="article-image"
+                 onerror="handleArticleImageError(this, '${article.source}')">
+        </div>
         <h1>${article.headline}</h1>
         <div class="meta-info">
             <span>By <strong>${article.source}</strong></span>
@@ -47,13 +68,56 @@ function renderArticle(article) {
     `;
 }
 
+function handleArticleImageError(img, source) {
+    console.log(`Article image failed to load for source: ${source}`);
+    
+    const sourceColors = {
+        "Reuters": "2e5266",
+        "BBC News": "bb1919", 
+        "The Guardian": "052962",
+        "TechCrunch": "00d084",
+        "Associated Press": "0066cc"
+    };
+    
+    const color = sourceColors[source] || "1a1f26";
+    const encodedSource = encodeURIComponent(source);
+    img.src = `https://via.placeholder.com/800x400/${color}/ffffff?text=${encodedSource}`;
+    img.onerror = null;
+}
+
 function renderRelatedArticles(articles) {
     const grid = document.getElementById('related-articles-grid');
     articles.forEach(article => {
         const card = document.createElement('div');
         card.className = 'preview-card';
         card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
-        card.innerHTML = `<img src="${article.image_url || 'https://via.placeholder.com/400x180'}" class="card-image"><div class="card-content"><h3>${article.headline}</h3></div>`;
+        
+        let imageUrl = article.image_url;
+        if (!imageUrl || imageUrl.trim() === '') {
+            const sourceColors = {
+                "Reuters": "2e5266",
+                "BBC News": "bb1919", 
+                "The Guardian": "052962",
+                "TechCrunch": "00d084",
+                "Associated Press": "0066cc"
+            };
+            
+            const color = sourceColors[article.source] || "1a1f26";
+            const encodedSource = encodeURIComponent(article.source);
+            imageUrl = `https://via.placeholder.com/400x180/${color}/ffffff?text=${encodedSource}`;
+        }
+        
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${imageUrl}" 
+                     class="card-image" 
+                     alt="${article.headline}"
+                     onerror="this.src='https://via.placeholder.com/400x180/1a1f26/ffffff?text=News'">
+            </div>
+            <div class="card-content">
+                <h3>${article.headline}</h3>
+            </div>
+        `;
         grid.appendChild(card);
     });
 }

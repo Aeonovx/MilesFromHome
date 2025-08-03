@@ -3,20 +3,32 @@ function createPreviewCard(article) {
     card.className = 'preview-card';
     card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
 
-    // --- Bulletproof Image Handling ---
+    // Enhanced image handling with multiple fallbacks
     let imageUrl = article.image_url;
     
-    // 1. Check if the image URL is null, undefined, or an empty string.
-    if (!imageUrl) {
-        // If no image, use a placeholder.
-        imageUrl = `https://via.placeholder.com/400x180/1a1f26/8b949e?text=MilesFromHome`;
-        console.log(`Article ID ${article.id} ("${article.headline}") has no image. Using placeholder.`);
+    // If no image URL or it's empty, create a themed placeholder
+    if (!imageUrl || imageUrl.trim() === '') {
+        const sourceColors = {
+            "Reuters": "2e5266",
+            "BBC News": "bb1919", 
+            "The Guardian": "052962",
+            "TechCrunch": "00d084",
+            "Associated Press": "0066cc"
+        };
+        
+        const color = sourceColors[article.source] || "1a1f26";
+        const encodedSource = encodeURIComponent(article.source);
+        imageUrl = `https://via.placeholder.com/400x180/${color}/ffffff?text=${encodedSource}`;
     }
 
-    // 2. Build the HTML for the card.
-    // This structure guarantees the <img> tag is ALWAYS present.
     card.innerHTML = `
-        <img src="${imageUrl}" alt="${article.headline}" class="card-image" onerror="this.style.display='none'">
+        <div class="card-image-container">
+            <img src="${imageUrl}" 
+                 alt="${article.headline}" 
+                 class="card-image" 
+                 loading="lazy"
+                 onerror="handleImageError(this, '${article.source}')">
+        </div>
         <div class="card-content">
             <h3>${article.headline}</h3>
         </div>
@@ -29,10 +41,27 @@ function createPreviewCard(article) {
     return card;
 }
 
+// Global function to handle image loading errors
+function handleImageError(img, source) {
+    console.log(`Image failed to load for source: ${source}`);
+    
+    const sourceColors = {
+        "Reuters": "2e5266",
+        "BBC News": "bb1919", 
+        "The Guardian": "052962",
+        "TechCrunch": "00d084",
+        "Associated Press": "0066cc"
+    };
+    
+    const color = sourceColors[source] || "1a1f26";
+    const encodedSource = encodeURIComponent(source);
+    img.src = `https://via.placeholder.com/400x180/${color}/ffffff?text=${encodedSource}`;
+    
+    // Remove the onerror to prevent infinite loops
+    img.onerror = null;
+}
 
-// Make sure the rest of your script.js file remains the same
-// The functions below should already be in your file
-
+// Rest of the existing code
 let allArticles = [];
 let displayedArticles = 0;
 const articlesPerPage = 9;
