@@ -1,92 +1,178 @@
+/* General Body & Typography */
 body {
-    font-family: 'Georgia', serif;
-    background-color: #f4f4f4;
-    color: #333;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #0d1117;
+    color: #c9d1d9;
     margin: 0;
-    line-height: 1.8;
+    line-height: 1.7;
 }
 
+a {
+    color: #58a6ff;
+    text-decoration: none;
+}
+
+/* Header */
 header {
-    background: #fff;
-    color: #000;
-    padding: 2rem 1rem;
     text-align: center;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 2rem 1rem;
+    border-bottom: 1px solid #21262d;
 }
 
 header h1 {
     margin: 0;
-    font-size: 3rem;
-    font-weight: normal;
-    letter-spacing: 1px;
+    font-size: 2.5rem;
+    font-weight: 600;
 }
 
-.powered-by {
+header .powered-by {
     font-size: 1rem;
-    color: #777;
-    font-style: italic;
+    color: #8b949e;
 }
 
+/* Main Content */
 main {
-    padding: 2rem;
-    max-width: 800px;
-    margin: auto;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
 }
 
-.news-card {
-    background: #fff;
-    margin-bottom: 2.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+/* News Grid - Homepage */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* News Preview Card - Homepage */
+.preview-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
-.news-card:hover {
+.preview-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-.news-card img.news-image {
+.preview-card .card-image {
     width: 100%;
-    height: 400px;
+    height: 180px;
     object-fit: cover;
 }
 
-.news-content {
-    padding: 2rem;
+.card-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-.news-content h2 {
-    margin-top: 0;
-    font-size: 2rem;
+.card-content h3 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
 }
 
-.news-content a {
-    color: #d6336c;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.news-content .explained-text {
-    color: #555;
-    font-size: 1.1rem;
-}
-
-.news-meta {
+.card-content p {
     font-size: 0.9rem;
-    color: #888;
-    margin-top: 1.5rem;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
+    color: #8b949e;
+    flex-grow: 1;
+    margin: 0 0 1rem 0;
 }
 
-footer {
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #21262d;
+    padding-top: 0.75rem;
+}
+
+.hotness-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.hotness-indicator span {
+    margin-left: 0.5rem;
+}
+
+/* WhatsApp Share Button */
+.whatsapp-share-btn {
+    background-color: #25D366;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.whatsapp-share-btn:hover {
+    background-color: #1DAE56;
+}
+
+/* Article View - article.html */
+.article-view {
+    max-width: 800px;
+    background: #161b22;
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+.article-view .article-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.article-view h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+}
+
+.article-view .meta-info {
+    color: #8b949e;
+    margin-bottom: 2rem;
+}
+
+.article-view .explained-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.back-link {
+    display: block;
     text-align: center;
-    padding: 1.5rem;
-    background: #fff;
-    color: #999;
-    margin-top: 2rem;
-    border-top: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .article-view {
+        padding: 1rem;
+    }
+
+    .article-view h1 {
+        font-size: 1.8rem;
+    }
 }
