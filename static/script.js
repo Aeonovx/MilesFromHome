@@ -47,7 +47,10 @@ function createPreviewCard(article) {
     const card = document.createElement('div');
     card.className = 'preview-card';
     card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
+
+    // FIX FOR IMAGES: This line guarantees an image URL is always available.
     const imageUrl = article.image_url || `https://via.placeholder.com/400x180/1a1f26/8b949e?text=MilesFromHome`;
+    
     card.innerHTML = `
         <img src="${imageUrl}" alt="${article.headline}" class="card-image">
         <div class="card-content">
