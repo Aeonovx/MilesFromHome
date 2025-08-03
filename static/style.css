@@ -1,119 +1,48 @@
 /* --- Themes --- */
-:root {
-    --bg-color: #101418;
-    --card-bg-color: #1a1f26;
-    --text-color: #e6edf3;
-    --text-muted-color: #8b949e;
-    --border-color: #30363d;
-    --accent-color: #388bfd;
-    --hot-color: #f778ba;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-}
-html.light {
-    --bg-color: #ffffff;
-    --card-bg-color: #f6f8fa;
-    --text-color: #1f2328;
-    --text-muted-color: #656d76;
-    --border-color: #d0d7de;
-    --accent-color: #0969da;
-    --hot-color: #d12771;
-}
+:root { --bg-color: #101418; --card-bg-color: #1a1f26; --text-color: #e6edf3; --text-muted-color: #8b949e; --border-color: #30363d; --accent-color: #388bfd; --hot-color: #f778ba; --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+html.light { --bg-color: #f6f8fa; --card-bg-color: #ffffff; --text-color: #1f2328; --text-muted-color: #656d76; --border-color: #d0d7de; --accent-color: #0969da; --hot-color: #d12771; }
 
-/* --- General --- */
-body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    margin: 0;
-    line-height: 1.6;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-a { color: var(--accent-color); text-decoration: none; }
-h1, h2, h3 { line-height: 1.3; font-weight: 600; }
+/* --- General & Mobile First --- */
+body { font-family: var(--font-sans); background-color: var(--bg-color); color: var(--text-color); margin: 0; line-height: 1.6; }
+main { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
+h1, h2, h3 { font-weight: 600; }
 
-/* --- Premium Header --- */
-header {
-    text-align: center;
-    padding: 3rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-}
-.header-content h1 {
-    margin: 0;
-    font-size: 3rem;
-    font-weight: 700;
-}
-.header-content .tagline {
-    margin: 0.25rem 0 0 0;
-    font-size: 1.1rem;
-    color: var(--text-muted-color);
-}
-.theme-toggle, .back-link {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-.back-link { left: 1.5rem; right: auto; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;}
+/* --- Header --- */
+header { text-align: center; padding: 2rem 1rem; border-bottom: 1px solid var(--border-color); }
+.header-content h1 { margin: 0; font-size: 2rem; font-weight: 700; }
+.header-content .tagline { margin: 0.25rem 0 0; color: var(--text-muted-color); }
 
-/* --- Premium Controls Area --- */
-.controls-area {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-}
+/* --- Premium Controls --- */
+.controls-area { max-width: 800px; margin: 1.5rem auto; }
 .search-wrapper { position: relative; margin-bottom: 1.5rem; }
-.search-wrapper::before { content: '🔍'; position: absolute; left: 15px; top: 13px; color: var(--text-muted-color); }
-#search-bar { width: 100%; background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.75rem 0.75rem 0.75rem 40px; border-radius: 8px; font-size: 1rem; }
-
-.filter-tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 1rem; }
-.filter-tabs button { background: none; border: none; color: var(--text-muted-color); padding: 0.75rem 1rem; cursor: pointer; font-size: 1rem; position: relative; }
-.filter-tabs button.active { color: var(--text-color); font-weight: 600; }
-.filter-tabs button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background-color: var(--accent-color); }
-
-.trending-pills { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-.trending-pills a { background-color: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.9rem; transition: background-color 0.2s; }
-.trending-pills a:hover { background-color: var(--border-color); }
+.search-wrapper::before { content: '🔍'; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); }
+#search-bar { width: 100%; background-color: var(--card-bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.75rem 0.75rem 0.75rem 40px; border-radius: 8px; font-size: 1rem; }
+.category-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.category-selector button { background-color: var(--card-bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 1rem; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 0.75rem; transition: background-color 0.2s; }
+.category-selector button.active { background-color: var(--accent-color); color: white; font-weight: 600; border-color: var(--accent-color); }
+.category-selector button:hover { background-color: var(--border-color); }
 
 /* --- News Grid & Cards --- */
-main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-.news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-.preview-card { /* ... existing styles ... */ }
-/* ... (Keep your existing .preview-card styles from the previous version) ... */
-
-/* --- Article Page --- */
-.article-view { /* ... existing styles ... */ }
-.related-articles-section, .comments-section {
-    max-width: 800px;
-    margin: 3rem auto;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-}
-/* ... (Keep your existing article & other styles) ... */
-
-/* --- Keep all your other styles below this line --- */
-.preview-card, .article-view, .admin-view { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; }
-.preview-card { overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; }
-.preview-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); }
+.news-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+.preview-card { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s ease; }
+.preview-card:hover { transform: translateY(-4px); }
 .card-image { width: 100%; height: 180px; object-fit: cover; }
 .card-content { padding: 1rem; flex-grow: 1; }
-.card-content h3 { font-size: 1.2rem; margin: 0 0 0.5rem; }
-.card-content p { font-size: 0.9rem; color: var(--text-muted-color); margin: 0; }
-.card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding: 0.75rem 1rem; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding: 0.75rem 1rem; font-size: 0.9rem; color: var(--text-muted-color); }
 .hotness-indicator { font-weight: 600; color: var(--hot-color); }
-.load-more-btn { display: block; width: 100%; padding: 1rem; margin-top: 2rem; background-color: var(--accent-color); color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
-.article-view { max-width: 800px; padding: 2rem; margin: auto; }
-.article-image { width: 100%; border-radius: 8px; margin-bottom: 1.5rem; }
-.article-view h1 { font-size: 2.5rem; }
-.meta-info, .share-buttons { color: var(--text-muted-color); margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; }
-footer { border-top: 1px solid var(--border-color); padding: 2rem 1rem; margin-top: 3rem; text-align: center; }
-.newsletter { max-width: 500px; margin: 0 auto 2rem auto; background-color: var(--card-bg-color); padding: 2rem; border-radius: 12px; }
-.footer-text { color: var(--text-muted-color); font-size: 0.9rem; }
+
+/* --- Article & Discussion Section --- */
+.article-view { padding: 1rem; }
+.related-articles-section, .comments-section { max-width: 800px; margin: 3rem auto; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+.comments-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 2rem; }
+
+/* --- Larger Screens (Tablet & Desktop) --- */
+@media (min-width: 600px) {
+    .news-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+    .header-content h1 { font-size: 2.5rem; }
+    .news-grid { grid-template-columns: repeat(3, 1fr); }
+    .category-selector { grid-template-columns: repeat(4, 1fr); }
+}
