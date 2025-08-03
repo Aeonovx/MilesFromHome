@@ -9,28 +9,37 @@
 <body>
     <header>
         <div class="header-content">
-            <a href="/" class="back-link">&larr; Back to site</a>
+            <a href="/" class="back-link">&larr; Back to Site</a>
             <h1>Admin Dashboard</h1>
         </div>
     </header>
-    <main class="admin-view" id="admin-container">
-        <h2>Site Statistics</h2>
-        <div class="stats-grid">
+    <main class="admin-view">
+        <div class="stats-overview">
             <div class="stat-card">
                 <h3>Total Articles</h3>
                 <p id="total-articles">...</p>
             </div>
             <div class="stat-card">
-                <h3>Newsletter Subscribers</h3>
+                <h3>Subscribers</h3>
                 <p id="total-subscribers">...</p>
             </div>
+            <div class="stat-card">
+                <h3>Last Update (UTC)</h3>
+                <p id="last-updated" class="small-text">...</p>
+            </div>
         </div>
-        <h2>Articles per Source</h2>
-        <div id="source-stats" class="stats-grid"></div>
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Articles by Source</h3>
+                <canvas id="sourceChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Articles by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
     </main>
-    <footer>
-        <p>&copy; 2025 MilesFromHome. All rights reserved.</p>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
