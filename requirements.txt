@@ -1,24 +1,6 @@
-# AI and Search
-sentence-transformers
-huggingface-hub
-scikit-learn
-numpy
-
-# Groq API
-groq
-
-# UI Framework - Updated to compatible versions
-gradio
-pydantic
 fastapi
-
-# Utilities
+uvicorn
+feedparser
+apscheduler
+groq
 python-dotenv
-PyYAML
-requests
-
-# Phase 2: Memory and Intelligence Dependencies
-# Already included in standard library:
-# - pickle (for conversation memory persistence)
-# - collections (for defaultdict, deque)
-# - datetime (for timestamp tracking)
