@@ -10,6 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import feedparser
 from groq import Groq
 from dotenv import load_dotenv
+import hashlib
 
 # --- Configuration & Setup ---
 load_dotenv()
@@ -33,6 +34,35 @@ CATEGORIES = {
 }
 STOP_WORDS = set(["the", "a", "an", "in", "on", "of", "for", "to", "with", "and", "or", "is", "are", "was", "were"])
 
+# Enhanced source-specific styling
+SOURCE_THEMES = {
+    "Reuters": {
+        "color": "ff6600",
+        "text_color": "ffffff",
+        "icon": "📰"
+    },
+    "BBC News": {
+        "color": "bb1919", 
+        "text_color": "ffffff",
+        "icon": "📺"
+    },
+    "The Guardian": {
+        "color": "052962",
+        "text_color": "ffffff", 
+        "icon": "🗞️"
+    },
+    "TechCrunch": {
+        "color": "00d084",
+        "text_color": "000000",
+        "icon": "💻"
+    },
+    "Associated Press": {
+        "color": "0066cc",
+        "text_color": "ffffff",
+        "icon": "📄"
+    }
+}
+
 # --- Helper Functions ---
 def categorize_article(headline, summary):
     text = f"{headline.lower()} {summary.lower()}"
@@ -41,59 +71,92 @@ def categorize_article(headline, summary):
             return category
     return "General"
 
-def get_image_from_entry(entry):
-    """Extract image URL from RSS entry with multiple fallback methods"""
+def create_themed_placeholder(source, headline, size="400x180"):
+    """Create a themed placeholder image URL with source branding"""
+    theme = SOURCE_THEMES.get(source, {
+        "color": "1a1f26",
+        "text_color": "8b949e", 
+        "icon": "📰"
+    })
     
-    # Method 1: Check media_content (common in RSS feeds)
+    # Create a short, readable text for the placeholder
+    icon = theme["icon"]
+    source_name = source.replace(" ", "+")
+    
+    # Use headline hash to create consistent but varied backgrounds
+    headline_hash = hashlib.md5(headline.encode()).hexdigest()[:6]
+    
+    return f"https://via.placeholder.com/{size}/{theme['color']}/{theme['text_color']}?text={icon}+{source_name}"
+
+def get_image_from_entry(entry, source, headline):
+    """Extract image URL from RSS entry with comprehensive fallback methods"""
+    
+    # Method 1: Check media_content (most common)
     if hasattr(entry, 'media_content') and entry.media_content:
         for media in entry.media_content:
-            if media.get('type', '').startswith('image/'):
-                return media.get('url')
+            url = media.get('url', '')
+            if url and ('jpg' in url.lower() or 'jpeg' in url.lower() or 'png' in url.lower() or 'webp' in url.lower()):
+                print(f"✅ Found media_content image: {url[:50]}...")
+                return url
     
     # Method 2: Check media_thumbnail
     if hasattr(entry, 'media_thumbnail') and entry.media_thumbnail:
-        return entry.media_thumbnail[0].get('url')
+        url = entry.media_thumbnail[0].get('url', '')
+        if url:
+            print(f"✅ Found thumbnail image: {url[:50]}...")
+            return url
     
     # Method 3: Check enclosures for images
     if hasattr(entry, 'enclosures') and entry.enclosures:
         for enclosure in entry.enclosures:
             if enclosure.get('type', '').startswith('image/'):
-                return enclosure.get('href')
+                url = enclosure.get('href', '')
+                if url:
+                    print(f"✅ Found enclosure image: {url[:50]}...")
+                    return url
     
     # Method 4: Check links for image types
     if hasattr(entry, 'links') and entry.links:
         for link in entry.links:
             if link.get('type', '').startswith('image/'):
-                return link.get('href')
+                url = link.get('href', '')
+                if url:
+                    print(f"✅ Found link image: {url[:50]}...")
+                    return url
     
     # Method 5: Parse summary/description for img tags
     summary = entry.get('summary', '') or entry.get('description', '')
     if summary:
-        img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', summary)
-        if img_match:
-            return img_match.group(1)
+        # Look for img tags
+        img_matches = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', summary, re.IGNORECASE)
+        for img_url in img_matches:
+            if img_url and ('jpg' in img_url.lower() or 'jpeg' in img_url.lower() or 'png' in img_url.lower() or 'webp' in img_url.lower()):
+                print(f"✅ Found summary image: {img_url[:50]}...")
+                return img_url
     
     # Method 6: Look for images in content
     if hasattr(entry, 'content') and entry.content:
         for content in entry.content:
             content_value = content.get('value', '')
-            img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', content_value)
-            if img_match:
-                return img_match.group(1)
+            img_matches = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', content_value, re.IGNORECASE)
+            for img_url in img_matches:
+                if img_url and ('jpg' in img_url.lower() or 'jpeg' in img_url.lower() or 'png' in img_url.lower() or 'webp' in img_url.lower()):
+                    print(f"✅ Found content image: {img_url[:50]}...")
+                    return img_url
     
-    # Method 7: Generate a themed placeholder based on source
-    source_colors = {
-        "Reuters": "2e5266",
-        "BBC News": "bb1919", 
-        "The Guardian": "052962",
-        "TechCrunch": "00d084",
-        "Associated Press": "0066cc"
-    }
+    # Method 7: Try to extract from link URLs (some feeds include images in URLs)
+    if hasattr(entry, 'link') and entry.link:
+        # Some news sites have predictable image URL patterns
+        if 'bbc.co.uk' in entry.link:
+            # BBC often has images we can construct
+            pass
+        elif 'theguardian.com' in entry.link:
+            # Guardian sometimes has extractable images
+            pass
     
-    source_name = getattr(entry, 'source', 'News')
-    color = source_colors.get(source_name, "1a1f26")
-    
-    return f"https://via.placeholder.com/800x400/{color}/ffffff?text={source_name.replace(' ', '+')}"
+    # If no image found, create themed placeholder
+    print(f"❌ No image found for '{headline[:30]}...', using themed placeholder")
+    return create_themed_placeholder(source, headline)
 
 def explain_with_ai(summary):
     if not os.environ.get("GROQ_API_KEY"): 
@@ -101,13 +164,22 @@ def explain_with_ai(summary):
     try:
         chat_completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "You are a news analyst. Expand the summary into a clear, 2-3 paragraph explanation. Focus on context and importance. Use clean markdown."}, 
-                {"role": "user", "content": f"Explain: {summary}"}
+                {
+                    "role": "system", 
+                    "content": "You are a news analyst. Expand the summary into a clear, 2-3 paragraph explanation. Focus on context and importance. Use clean markdown."
+                }, 
+                {
+                    "role": "user", 
+                    "content": f"Explain: {summary}"
+                }
             ], 
-            model="llama3-8b-8192"
+            model="llama3-8b-8192",
+            max_tokens=int(os.environ.get("MAX_TOKENS", 200)),
+            temperature=float(os.environ.get("TEMPERATURE", 0.01))
         )
         return chat_completion.choices[0].message.content
     except Exception as e: 
+        print(f"AI explanation error: {e}")
         return "Could not generate AI explanation."
 
 # --- Core News Fetching ---
@@ -115,48 +187,75 @@ def fetch_and_process_news():
     processed_news = []
     article_id = 0
     
+    print(f"🚀 Starting news fetch at {datetime.now()}")
+    
     for source, url in NEWS_FEEDS.items():
         try:
-            print(f"Fetching from {source}...")
+            print(f"📡 Fetching from {source}...")
             feed = feedparser.parse(url)
             
-            for entry in feed.entries[:8]:
-                summary = entry.get('summary', entry.get('description', 'No summary available.'))
-                image_url = get_image_from_entry(entry)
-                
-                # Log image extraction for debugging
-                print(f"Article: {entry.title[:50]}... | Image: {image_url}")
-                
-                processed_news.append({
-                    "id": article_id, 
-                    "source": source, 
-                    "headline": entry.title, 
-                    "link": entry.link, 
-                    "published": entry.get("published", "N/A"),
-                    "image_url": image_url, 
-                    "summary": summary, 
-                    "explained_version": explain_with_ai(summary),
-                    "hotness": random.randint(70, 100), 
-                    "category": categorize_article(entry.title, summary),
-                    "keywords": [kw.lower() for kw in re.findall(r'\b\w{4,}\b', entry.title.lower()) if kw.lower() not in STOP_WORDS]
-                })
-                article_id += 1
-        except Exception as e:
-            print(f"Error fetching from {source}: {e}")
-            continue
+            if not feed.entries:
+                print(f"⚠️ No entries found for {source}")
+                continue
             
-    with open(NEWS_FILE, "w") as f:
-        json.dump({"articles": processed_news, "last_updated": datetime.utcnow().isoformat()}, f, indent=4)
+            for entry in feed.entries[:8]:
+                try:
+                    summary = entry.get('summary', entry.get('description', 'No summary available.'))
+                    headline = entry.get('title', 'No title')
+                    
+                    # GUARANTEED image - either real or themed placeholder
+                    image_url = get_image_from_entry(entry, source, headline)
+                    
+                    article = {
+                        "id": article_id, 
+                        "source": source, 
+                        "headline": headline, 
+                        "link": entry.get('link', '#'), 
+                        "published": entry.get("published", "N/A"),
+                        "image_url": image_url,  # This will ALWAYS have a value
+                        "summary": summary, 
+                        "explained_version": explain_with_ai(summary),
+                        "hotness": random.randint(70, 100), 
+                        "category": categorize_article(headline, summary),
+                        "keywords": [kw.lower() for kw in re.findall(r'\b\w{4,}\b', headline.lower()) if kw.lower() not in STOP_WORDS]
+                    }
+                    
+                    processed_news.append(article)
+                    article_id += 1
+                    
+                    print(f"✅ Processed: {headline[:40]}... | Image: {'✅' if 'placeholder' not in image_url else '🎨'}")
+                    
+                except Exception as e:
+                    print(f"❌ Error processing article from {source}: {e}")
+                    continue
+                    
+        except Exception as e:
+            print(f"❌ Error fetching from {source}: {e}")
+            continue
     
-    print(f"✅ News processing complete at {datetime.now()}. {len(processed_news)} articles fetched.")
+    # Save processed news
+    try:
+        with open(NEWS_FILE, "w") as f:
+            json.dump({
+                "articles": processed_news, 
+                "last_updated": datetime.utcnow().isoformat()
+            }, f, indent=4)
+        
+        print(f"✅ News processing complete! {len(processed_news)} articles saved.")
+        
+    except Exception as e:
+        print(f"❌ Error saving news file: {e}")
 
 # --- API Endpoints ---
 @app.on_event("startup")
 def start_scheduler():
     scheduler = BackgroundScheduler(timezone="UTC")
+    # Initial fetch
     fetch_and_process_news()
+    # Schedule regular updates
     scheduler.add_job(fetch_and_process_news, 'interval', minutes=30)
     scheduler.start()
+    print("🔄 Scheduler started - news will update every 30 minutes")
 
 @app.get("/api/news")
 async def get_news(search: str = None, category: str = None):

@@ -1,24 +1,35 @@
+// Source-specific themes matching backend
+const SOURCE_THEMES = {
+    "Reuters": { color: "ff6600", textColor: "ffffff", icon: "📰" },
+    "BBC News": { color: "bb1919", textColor: "ffffff", icon: "📺" },
+    "The Guardian": { color: "052962", textColor: "ffffff", icon: "🗞️" },
+    "TechCrunch": { color: "00d084", textColor: "000000", icon: "💻" },
+    "Associated Press": { color: "0066cc", textColor: "ffffff", icon: "📄" }
+};
+
+function createFallbackImage(source, headline, size = "400x180") {
+    const theme = SOURCE_THEMES[source] || {
+        color: "1a1f26",
+        textColor: "8b949e", 
+        icon: "📰"
+    };
+    
+    const encodedSource = encodeURIComponent(source.replace(" ", "+"));
+    return `https://via.placeholder.com/${size}/${theme.color}/${theme.textColor}?text=${theme.icon}+${encodedSource}`;
+}
+
 function createPreviewCard(article) {
     const card = document.createElement('div');
     card.className = 'preview-card';
     card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
 
-    // Enhanced image handling with multiple fallbacks
+    // Enhanced image handling - GUARANTEED to show something
     let imageUrl = article.image_url;
     
-    // If no image URL or it's empty, create a themed placeholder
-    if (!imageUrl || imageUrl.trim() === '') {
-        const sourceColors = {
-            "Reuters": "2e5266",
-            "BBC News": "bb1919", 
-            "The Guardian": "052962",
-            "TechCrunch": "00d084",
-            "Associated Press": "0066cc"
-        };
-        
-        const color = sourceColors[article.source] || "1a1f26";
-        const encodedSource = encodeURIComponent(article.source);
-        imageUrl = `https://via.placeholder.com/400x180/${color}/ffffff?text=${encodedSource}`;
+    // Double-check that we have an image URL
+    if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'null' || imageUrl === 'undefined') {
+        console.warn(`No image URL for article: ${article.headline.substring(0, 50)}...`);
+        imageUrl = createFallbackImage(article.source, article.headline);
     }
 
     card.innerHTML = `
@@ -27,7 +38,9 @@ function createPreviewCard(article) {
                  alt="${article.headline}" 
                  class="card-image" 
                  loading="lazy"
-                 onerror="handleImageError(this, '${article.source}')">
+                 onload="handleImageLoad(this)"
+                 onerror="handleImageError(this, '${article.source}', '${article.headline.replace(/'/g, '\\\'')}')"
+                 style="opacity: 0; transition: opacity 0.3s;">
         </div>
         <div class="card-content">
             <h3>${article.headline}</h3>
@@ -41,27 +54,37 @@ function createPreviewCard(article) {
     return card;
 }
 
-// Global function to handle image loading errors
-function handleImageError(img, source) {
-    console.log(`Image failed to load for source: ${source}`);
-    
-    const sourceColors = {
-        "Reuters": "2e5266",
-        "BBC News": "bb1919", 
-        "The Guardian": "052962",
-        "TechCrunch": "00d084",
-        "Associated Press": "0066cc"
-    };
-    
-    const color = sourceColors[source] || "1a1f26";
-    const encodedSource = encodeURIComponent(source);
-    img.src = `https://via.placeholder.com/400x180/${color}/ffffff?text=${encodedSource}`;
-    
-    // Remove the onerror to prevent infinite loops
-    img.onerror = null;
+// Handle successful image load
+function handleImageLoad(img) {
+    img.style.opacity = '1';
 }
 
-// Rest of the existing code
+// Enhanced error handling
+function handleImageError(img, source, headline) {
+    console.log(`Image failed to load for: ${headline.substring(0, 30)}... from ${source}`);
+    
+    // Set fallback image
+    const fallbackUrl = createFallbackImage(source, headline);
+    
+    // Only change if not already a placeholder to prevent infinite loops
+    if (!img.src.includes('placeholder')) {
+        img.src = fallbackUrl;
+        img.onerror = null; // Remove error handler to prevent loops
+        img.style.opacity = '1'; // Show the fallback immediately
+    }
+}
+
+// Enhanced image preloading
+function preloadImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => reject(url);
+        img.src = url;
+    });
+}
+
+// Rest of the existing code with enhancements
 let allArticles = [];
 let displayedArticles = 0;
 const articlesPerPage = 9;
@@ -74,23 +97,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function fetchNews(searchTerm = '', category = 'All') {
     const url = `/api/news?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(category)}`;
+    
+    // Show loading state
+    const grid = document.getElementById('news-grid');
+    if (displayedArticles === 0) {
+        grid.innerHTML = '<div class="loading">Loading news...</div>';
+    }
+    
     fetch(url)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             allArticles = data.articles;
             displayedArticles = 0;
-            document.getElementById('news-grid').innerHTML = '';
+            grid.innerHTML = '';
             renderCategorySelector(data.categories, category);
             loadMoreArticles();
         })
-        .catch(error => console.error('Error fetching news:', error));
+        .catch(error => {
+            console.error('Error fetching news:', error);
+            grid.innerHTML = '<div class="error">Failed to load news. Please try again.</div>';
+        });
 }
 
 function renderCategorySelector(categories, activeCategory) {
     const container = document.getElementById('category-selector');
-    const icons = { "All": '🌐', "EU News": '🇪🇺', "Tech": '💻', "Travel": '✈️', "General": '📰' };
+    const icons = { 
+        "All": '🌐', 
+        "EU News": '🇪🇺', 
+        "Tech": '💻', 
+        "Travel": '✈️', 
+        "General": '📰' 
+    };
+    
     container.innerHTML = categories.map(cat => `
-        <button class="${activeCategory === cat ? 'active' : ''}" onclick="fetchNews(document.getElementById('search-bar').value, '${cat}')">
+        <button class="${activeCategory === cat ? 'active' : ''}" 
+                onclick="fetchNews(document.getElementById('search-bar').value, '${cat}')">
             <span class="icon">${icons[cat] || '•'}</span> ${cat}
         </button>
     `).join('');
@@ -101,8 +145,25 @@ function loadMoreArticles() {
     const fragment = document.createDocumentFragment();
     const articlesToLoad = allArticles.slice(displayedArticles, displayedArticles + articlesPerPage);
 
-    articlesToLoad.forEach(article => fragment.appendChild(createPreviewCard(article)));
+    if (articlesToLoad.length === 0) {
+        document.getElementById('load-more').style.display = 'none';
+        return;
+    }
+
+    articlesToLoad.forEach(article => {
+        const card = createPreviewCard(article);
+        fragment.appendChild(card);
+    });
+    
     grid.appendChild(fragment);
     displayedArticles += articlesToLoad.length;
-    document.getElementById('load-more').style.display = displayedArticles >= allArticles.length ? 'none' : 'block';
+    
+    // Hide load more button if all articles are displayed
+    const loadMoreBtn = document.getElementById('load-more');
+    if (displayedArticles >= allArticles.length) {
+        loadMoreBtn.style.display = 'none';
+    } else {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.textContent = `Load More (${allArticles.length - displayedArticles} remaining)`;
+    }
 }
