@@ -30,52 +30,76 @@ NEWS_FEEDS = {
     "Associated Press": "https://apnews.com/hub/ap-top-news/rss.xml",
     # Category-specific feeds
     "Tech Reuters": "http://feeds.reuters.com/reuters/technologyNews",
-    "EU News": "https://www.theguardian.com/world/europe-news/rss",
+    "EU Guardian": "https://www.theguardian.com/world/europe-news/rss",
     "Travel Guardian": "https://www.theguardian.com/travel/rss",
     "Tech Guardian": "https://www.theguardian.com/technology/rss"
 }
 
-# Enhanced categorization with more comprehensive keywords
-CATEGORIES = {
-    "Tech": [
-        # Companies
-        "apple", "google", "microsoft", "amazon", "facebook", "meta", "tesla", "nvidia", "intel", "amd",
-        "openai", "anthropic", "chatgpt", "claude",
-        # Technology terms
-        "tech", "technology", "ai", "artificial intelligence", "machine learning", "crypto", "cryptocurrency", 
-        "bitcoin", "ethereum", "blockchain", "startup", "software", "app", "mobile", "iphone", "android",
-        "computer", "laptop", "gaming", "video game", "streaming", "netflix", "spotify", "youtube",
-        "internet", "wifi", "5g", "cloud", "data", "cybersecurity", "hack", "breach", "robot", "automation",
-        "electric vehicle", "ev", "autonomous", "self-driving", "drone", "virtual reality", "vr", "ar",
-        "augmented reality", "metaverse", "nft", "web3", "fintech", "digital", "online", "platform",
-        "social media", "twitter", "instagram", "tiktok", "linkedin", "whatsapp"
+# Refined categorization with stronger, more specific keywords
+TECH_KEYWORDS = {
+    # High-value tech keywords (weight 5)
+    "high_value": [
+        "artificial intelligence", "machine learning", "chatgpt", "openai", "ai model", 
+        "cryptocurrency", "bitcoin", "ethereum", "blockchain", "crypto", "nft",
+        "iphone", "android", "ios", "app store", "google play", "smartphone",
+        "tesla", "electric vehicle", "self-driving", "autonomous vehicle",
+        "startup", "tech startup", "silicon valley", "venture capital",
+        "software", "programming", "coding", "developer", "github",
+        "cloud computing", "aws", "azure", "google cloud", "saas",
+        "cybersecurity", "data breach", "hack", "cyber attack",
+        "social media", "facebook", "twitter", "instagram", "tiktok", "youtube",
+        "streaming", "netflix", "spotify", "gaming", "video game", "esports"
     ],
-    "EU News": [
-        # Countries
-        "europe", "european", "eu", "brexit", "uk", "britain", "british", "england", "scotland", "wales",
-        "france", "french", "germany", "german", "italy", "italian", "spain", "spanish", "netherlands",
-        "belgium", "austria", "poland", "czech", "hungary", "portugal", "greece", "ireland", "sweden",
-        "norway", "denmark", "finland", "switzerland", "croatia", "slovenia", "slovakia", "lithuania",
-        "latvia", "estonia", "romania", "bulgaria",
-        # Cities
-        "london", "paris", "berlin", "rome", "madrid", "amsterdam", "brussels", "vienna", "prague",
-        "budapest", "warsaw", "dublin", "stockholm", "oslo", "copenhagen", "helsinki", "zurich",
-        # Political/Economic terms
-        "european union", "eu parliament", "european commission", "eurozone", "euro", "schengen",
-        "european central bank", "ecb", "european council", "strasbourg", "brussels", "luxembourg"
+    # Medium-value tech keywords (weight 3)
+    "medium_value": [
+        "apple", "google", "microsoft", "amazon", "meta", "nvidia", "intel", "amd",
+        "tech", "technology", "digital", "online", "internet", "website", "platform",
+        "mobile", "computer", "laptop", "device", "gadget", "innovation",
+        "robot", "automation", "drone", "virtual reality", "vr", "ar", "metaverse"
     ],
-    "Travel": [
-        # Travel activities
-        "travel", "tourism", "tourist", "vacation", "holiday", "trip", "journey", "visit", "visiting",
-        "destination", "resort", "hotel", "accommodation", "booking", "airbnb",
-        # Transportation
-        "flight", "flights", "airline", "airport", "plane", "aircraft", "boeing", "airbus",
-        "train", "railway", "cruise", "ship", "ferry", "bus", "car rental", "uber", "taxi",
-        # Travel-related
-        "passport", "visa", "border", "customs", "immigration", "baggage", "luggage",
-        "sightseeing", "museum", "attraction", "beach", "mountain", "national park",
-        "backpacking", "adventure", "safari", "cruise", "expedition", "guide", "itinerary"
+    # Low-value tech keywords (weight 1) - only count if multiple present
+    "low_value": [
+        "data", "network", "system", "electronic", "digital", "smart", "tech"
     ]
+}
+
+EU_KEYWORDS = {
+    "high_value": [
+        "european union", "eu parliament", "european commission", "brexit", 
+        "eurozone", "european central bank", "schengen", "eu summit",
+        "strasbourg", "brussels parliament", "luxembourg court"
+    ],
+    "medium_value": [
+        "europe", "european", "eu", "britain", "british", "uk", "england", "scotland",
+        "france", "french", "germany", "german", "italy", "italian", "spain", "spanish",
+        "netherlands", "belgium", "austria", "poland", "portugal", "greece", "ireland",
+        "london", "paris", "berlin", "rome", "madrid", "amsterdam", "brussels"
+    ],
+    "low_value": [
+        "euro", "european", "british", "french", "german", "italian", "spanish"
+    ]
+}
+
+TRAVEL_KEYWORDS = {
+    "high_value": [
+        "tourism", "tourist", "vacation", "holiday", "travel ban", "travel advisory",
+        "airport", "airline", "flight", "cruise", "hotel", "resort", "booking",
+        "destination", "sightseeing", "backpacking", "safari", "expedition"
+    ],
+    "medium_value": [
+        "travel", "trip", "journey", "visit", "visiting", "plane", "aircraft",
+        "train", "railway", "ferry", "border", "customs", "immigration",
+        "passport", "visa", "luggage", "baggage", "museum", "attraction"
+    ],
+    "low_value": [
+        "visit", "trip", "plane", "train", "border"
+    ]
+}
+
+CATEGORIES = {
+    "Tech": TECH_KEYWORDS,
+    "EU News": EU_KEYWORDS,
+    "Travel": TRAVEL_KEYWORDS
 }
 
 STOP_WORDS = set(["the", "a", "an", "in", "on", "of", "for", "to", "with", "and", "or", "is", "are", "was", "were", "will", "would", "could", "should", "has", "have", "had"])
@@ -88,47 +112,73 @@ SOURCE_THEMES = {
     "TechCrunch": {"color": "00d084", "text_color": "000000", "icon": "💻"},
     "Associated Press": {"color": "0066cc", "text_color": "ffffff", "icon": "📄"},
     "Tech Reuters": {"color": "ff6600", "text_color": "ffffff", "icon": "🔧"},
-    "EU News": {"color": "003399", "text_color": "ffffff", "icon": "🇪🇺"},
-    "Travel Guardian": {"color": "052962", "text_color": "ffffff", "icon": "✈️"},
+    "EU Guardian": {"color": "003399", "text_color": "ffffff", "icon": "🇪🇺"},
+    "Travel Guardian": {"color": "ff6b35", "text_color": "ffffff", "icon": "✈️"},
     "Tech Guardian": {"color": "052962", "text_color": "ffffff", "icon": "💻"}
 }
 
 # --- Helper Functions ---
+def calculate_category_score(text, keywords_dict):
+    """Calculate weighted score for a category"""
+    text_lower = text.lower()
+    total_score = 0
+    
+    # High-value keywords
+    for keyword in keywords_dict.get("high_value", []):
+        if keyword in text_lower:
+            total_score += 5
+            
+    # Medium-value keywords  
+    for keyword in keywords_dict.get("medium_value", []):
+        if keyword in text_lower:
+            total_score += 3
+            
+    # Low-value keywords (only count if multiple present)
+    low_value_matches = 0
+    for keyword in keywords_dict.get("low_value", []):
+        if keyword in text_lower:
+            low_value_matches += 1
+    
+    # Only add low-value score if multiple matches
+    if low_value_matches >= 2:
+        total_score += low_value_matches
+    
+    return total_score
+
 def categorize_article(headline, summary, source):
-    """Enhanced categorization with source-aware logic"""
-    text = f"{headline.lower()} {summary.lower()}"
+    """Enhanced categorization with weighted scoring"""
+    text = f"{headline} {summary}"
     
     # Source-based categorization (highest priority)
-    if "tech" in source.lower():
+    source_lower = source.lower()
+    if "techcrunch" in source_lower or "tech" in source_lower:
+        print(f"Source-based categorization: {source} -> Tech")
         return "Tech"
-    elif "eu" in source.lower() or "europe" in source.lower():
-        return "EU News"
-    elif "travel" in source.lower():
+    elif "eu" in source_lower or ("guardian" in source_lower and "europe" in source_lower):
+        print(f"Source-based categorization: {source} -> EU News")
+        return "EU News"  
+    elif "travel" in source_lower:
+        print(f"Source-based categorization: {source} -> Travel")
         return "Travel"
     
-    # Score-based categorization for better accuracy
+    # Calculate scores for each category
     category_scores = {}
-    
-    for category, keywords in CATEGORIES.items():
-        score = 0
-        for keyword in keywords:
-            # Give more weight to exact matches in headline
-            if keyword in headline.lower():
-                score += 3
-            # Regular weight for summary matches
-            if keyword in text:
-                score += 1
+    for category, keywords_dict in CATEGORIES.items():
+        score = calculate_category_score(text, keywords_dict)
         category_scores[category] = score
     
-    # Find the category with highest score
-    if category_scores:
-        best_category = max(category_scores, key=category_scores.get)
-        # Only return category if it has a meaningful score (at least 1)
-        if category_scores[best_category] >= 1:
-            print(f"Categorized '{headline[:30]}...' as {best_category} (score: {category_scores[best_category]})")
-            return best_category
+    # Find the best category with minimum threshold
+    best_category = max(category_scores, key=category_scores.get) if category_scores else "General"
+    best_score = category_scores.get(best_category, 0)
     
-    print(f"Categorized '{headline[:30]}...' as General (no strong matches)")
+    # Require minimum score for categorization
+    MIN_SCORE_THRESHOLD = 5  # Increased threshold
+    
+    if best_score >= MIN_SCORE_THRESHOLD:
+        print(f"Categorized '{headline[:40]}...' as {best_category} (score: {best_score})")
+        return best_category
+    
+    print(f"Categorized '{headline[:40]}...' as General (highest score: {best_score}, below threshold)")
     return "General"
 
 def create_themed_placeholder(source, headline, size="800x400"):
@@ -149,7 +199,6 @@ def get_image_from_entry(entry, source, headline):
     
     # Method 1: Check media_content for largest available image
     if hasattr(entry, 'media_content') and entry.media_content:
-        # Sort by file size if available, or look for larger dimensions
         best_image = None
         best_size = 0
         
@@ -175,7 +224,7 @@ def get_image_from_entry(entry, source, headline):
             print(f"✅ Found high-quality media image: {best_image[:50]}...")
             return best_image
     
-    # Method 2: Check media_thumbnail (but prefer larger version)
+    # Method 2: Check media_thumbnail (but enhance it)
     if hasattr(entry, 'media_thumbnail') and entry.media_thumbnail:
         url = entry.media_thumbnail[0].get('url', '')
         if url:
@@ -184,7 +233,7 @@ def get_image_from_entry(entry, source, headline):
             print(f"✅ Found thumbnail (enhanced): {high_res_url[:50]}...")
             return high_res_url
     
-    # Method 3: Parse HTML content for images, prefer larger ones
+    # Method 3: Parse HTML content for images
     content_to_search = []
     
     if hasattr(entry, 'content') and entry.content:
@@ -199,11 +248,9 @@ def get_image_from_entry(entry, source, headline):
     
     best_image = None
     for content in content_to_search:
-        # Look for img tags with src attributes
         img_matches = re.findall(r'<img[^>]+src=["\']([^"\']+)["\'][^>]*>', content, re.IGNORECASE)
         for img_url in img_matches:
             if img_url and any(ext in img_url.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
-                # Prefer images with higher resolution indicators
                 if any(size in img_url for size in ['large', 'big', '800', '1200', 'full']):
                     print(f"✅ Found high-res content image: {img_url[:50]}...")
                     return img_url
@@ -256,7 +303,7 @@ def fetch_and_process_news():
     processed_news = []
     article_id = 0
     
-    print(f"🚀 Starting enhanced news fetch at {datetime.now()}")
+    print(f"🚀 Starting refined news fetch at {datetime.now()}")
     
     for source, url in NEWS_FEEDS.items():
         try:
@@ -278,7 +325,7 @@ def fetch_and_process_news():
                     # Enhanced image extraction
                     image_url = get_image_from_entry(entry, source, headline)
                     
-                    # Enhanced categorization
+                    # Refined categorization
                     category = categorize_article(headline, summary, source)
                     
                     article = {
@@ -298,8 +345,6 @@ def fetch_and_process_news():
                     processed_news.append(article)
                     article_id += 1
                     
-                    print(f"✅ {category}: {headline[:40]}...")
-                    
                 except Exception as e:
                     print(f"❌ Error processing article from {source}: {e}")
                     continue
@@ -310,7 +355,7 @@ def fetch_and_process_news():
     
     # Print categorization summary
     category_counts = Counter(article['category'] for article in processed_news)
-    print(f"\n📊 Categorization Summary:")
+    print(f"\n📊 Final Categorization Summary:")
     for category, count in category_counts.items():
         print(f"   {category}: {count} articles")
     
@@ -322,7 +367,7 @@ def fetch_and_process_news():
                 "last_updated": datetime.utcnow().isoformat()
             }, f, indent=4)
         
-        print(f"✅ Enhanced news processing complete! {len(processed_news)} articles saved.")
+        print(f"✅ Refined news processing complete! {len(processed_news)} articles saved.")
         
     except Exception as e:
         print(f"❌ Error saving news file: {e}")
@@ -334,7 +379,7 @@ def start_scheduler():
     fetch_and_process_news()
     scheduler.add_job(fetch_and_process_news, 'interval', minutes=30)
     scheduler.start()
-    print("🔄 Enhanced scheduler started - news will update every 30 minutes")
+    print("🔄 Refined scheduler started - news will update every 30 minutes")
 
 @app.get("/api/news")
 async def get_news(search: str = None, category: str = None):
@@ -350,7 +395,7 @@ async def get_news(search: str = None, category: str = None):
         if category and category != "All": 
             articles = [a for a in articles if a['category'] == category]
             
-        return {"articles": articles, "categories": ["All"] + list(CATEGORIES.keys())}
+        return {"articles": articles, "categories": ["All", "Tech", "EU News", "Travel", "General"]}
 
 @app.get("/api/news/{article_id}")
 async def get_article(article_id: int):
