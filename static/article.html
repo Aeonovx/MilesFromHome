@@ -8,10 +8,11 @@
 </head>
 <body>
     <header>
+        <a href="/" class="back-link">&larr; Back to all news</a>
+        <button id="theme-toggle" class="theme-toggle">
+            </button>
         <div class="header-content">
-            <a href="/" class="back-link">&larr; Back to all news</a>
             <h1>MilesFromHome</h1>
-            <button id="theme-toggle">Toggle Theme</button>
         </div>
     </header>
     
@@ -23,16 +24,16 @@
     </section>
     
     <section class="comments-section">
-        <h2>Discussion</h2>
+        <h2>Join the Discussion</h2>
         <div id="disqus_thread"></div>
     </section>
 
     <footer>
-        <p>&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
+        <p class="footer-text">&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
     </footer>
 
     <script>
-    (function() { // DON'T EDIT BELOW THIS LINE
+    (function() {
     var d = document, s = d.createElement('script');
     s.src = 'https://milesfromhome-aeonovx.disqus.com/embed.js'; // Replace with your Disqus shortname
     s.setAttribute('data-timestamp', +new Date());

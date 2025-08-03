@@ -8,20 +8,24 @@
 </head>
 <body>
     <header>
+        <button id="theme-toggle" class="theme-toggle">
+            </button>
         <div class="header-content">
             <h1>MilesFromHome</h1>
-            <p class="powered-by">The world's hot news, fully powered by <strong>AeonovX</strong></p>
-            <button id="theme-toggle">Toggle Theme</button>
+            <p class="tagline">The world's hot news, fully powered by <strong>AeonovX</strong></p>
         </div>
     </header>
     
     <main>
-        <div class="controls-container">
-            <input type="search" id="search-bar" placeholder="Search for articles...">
-            <div id="filter-buttons" class="filter-buttons"></div>
+        <div class="controls-area">
+            <div class="search-wrapper">
+                <input type="search" id="search-bar" placeholder="Search for articles...">
+            </div>
+            <div class="filter-tabs" id="filter-buttons">
+                </div>
+            <div class="trending-pills" id="trending-topics">
+                </div>
         </div>
-        
-        <div class="trending-topics" id="trending-topics"></div>
 
         <div class="news-grid" id="news-grid"></div>
         <button id="load-more" class="load-more-btn">Load More</button>
@@ -36,7 +40,7 @@
             </form>
             <p id="subscribe-message"></p>
         </div>
-        <p>&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
+        <p class="footer-text">&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
     </footer>
     
     <script src="script.js"></script>
