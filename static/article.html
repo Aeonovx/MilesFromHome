@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +8,39 @@
 </head>
 <body>
     <header>
-        <a href="/" class="back-link">&larr; Back to all news</a>
-        <h1>MilesFromHome</h1>
+        <div class="header-content">
+            <a href="/" class="back-link">&larr; Back to all news</a>
+            <h1>MilesFromHome</h1>
+            <button id="theme-toggle">Toggle Theme</button>
+        </div>
     </header>
-    <main class="article-view" id="article-container">
-        </main>
+    
+    <main class="article-view" id="article-container"></main>
+    
+    <section class="related-articles-section">
+        <h2>Related Articles</h2>
+        <div class="news-grid" id="related-articles-grid"></div>
+    </section>
+    
+    <section class="comments-section">
+        <h2>Discussion</h2>
+        <div id="disqus_thread"></div>
+    </section>
+
     <footer>
-        <p>&copy; 2025 MilesFromHome. All rights reserved.</p>
+        <p>&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
     </footer>
+
+    <script>
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://milesfromhome-aeonovx.disqus.com/embed.js'; // Replace with your Disqus shortname
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="article.js"></script>
 </body>

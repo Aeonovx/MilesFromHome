@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +8,37 @@
 </head>
 <body>
     <header>
-        <h1>MilesFromHome</h1>
-        <p class="powered-by">The world's hot news, fully powered by <strong>AeonovX</strong></p>
+        <div class="header-content">
+            <h1>MilesFromHome</h1>
+            <p class="powered-by">The world's hot news, fully powered by <strong>AeonovX</strong></p>
+            <button id="theme-toggle">Toggle Theme</button>
+        </div>
     </header>
+    
     <main>
-        <div class="news-grid" id="news-grid">
-            </div>
+        <div class="controls-container">
+            <input type="search" id="search-bar" placeholder="Search for articles...">
+            <div id="filter-buttons" class="filter-buttons"></div>
+        </div>
+        
+        <div class="trending-topics" id="trending-topics"></div>
+
+        <div class="news-grid" id="news-grid"></div>
+        <button id="load-more" class="load-more-btn">Load More</button>
     </main>
+    
     <footer>
-        <p>&copy; 2025 MilesFromHome. All rights reserved.</p>
+        <div class="newsletter">
+            <h3>Subscribe for Updates</h3>
+            <form id="subscribe-form">
+                <input type="email" id="email-input" placeholder="Your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+            <p id="subscribe-message"></p>
+        </div>
+        <p>&copy; 2025 MilesFromHome. All rights reserved. | <a href="/admin.html">Admin</a></p>
     </footer>
+    
     <script src="script.js"></script>
 </body>
 </html>
