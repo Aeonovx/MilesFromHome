@@ -1,3 +1,38 @@
+function createPreviewCard(article) {
+    const card = document.createElement('div');
+    card.className = 'preview-card';
+    card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
+
+    // --- Bulletproof Image Handling ---
+    let imageUrl = article.image_url;
+    
+    // 1. Check if the image URL is null, undefined, or an empty string.
+    if (!imageUrl) {
+        // If no image, use a placeholder.
+        imageUrl = `https://via.placeholder.com/400x180/1a1f26/8b949e?text=MilesFromHome`;
+        console.log(`Article ID ${article.id} ("${article.headline}") has no image. Using placeholder.`);
+    }
+
+    // 2. Build the HTML for the card.
+    // This structure guarantees the <img> tag is ALWAYS present.
+    card.innerHTML = `
+        <img src="${imageUrl}" alt="${article.headline}" class="card-image" onerror="this.style.display='none'">
+        <div class="card-content">
+            <h3>${article.headline}</h3>
+        </div>
+        <div class="card-footer">
+            <span class="hotness-indicator">🔥 ${article.hotness}% Hot</span>
+            <span>${article.source}</span>
+        </div>
+    `;
+
+    return card;
+}
+
+
+// Make sure the rest of your script.js file remains the same
+// The functions below should already be in your file
+
 let allArticles = [];
 let displayedArticles = 0;
 const articlesPerPage = 9;
@@ -41,29 +76,4 @@ function loadMoreArticles() {
     grid.appendChild(fragment);
     displayedArticles += articlesToLoad.length;
     document.getElementById('load-more').style.display = displayedArticles >= allArticles.length ? 'none' : 'block';
-}
-
-function createPreviewCard(article) {
-    const card = document.createElement('div');
-    card.className = 'preview-card';
-    card.onclick = () => window.location.href = `/article.html?id=${article.id}`;
-
-    // ==================================================================
-    //  THIS IS THE CRITICAL FIX FOR THE MISSING PHOTOS
-    //  It ensures that if article.image_url is missing, a default
-    //  placeholder image is used instead.
-    // ==================================================================
-    const imageUrl = article.image_url || `https://via.placeholder.com/400x180/1a1f26/8b949e?text=MilesFromHome`;
-    
-    card.innerHTML = `
-        <img src="${imageUrl}" alt="${article.headline}" class="card-image">
-        <div class="card-content">
-            <h3>${article.headline}</h3>
-        </div>
-        <div class="card-footer">
-            <span class="hotness-indicator">🔥 ${article.hotness}% Hot</span>
-            <span>${article.source}</span>
-        </div>
-    `;
-    return card;
 }
