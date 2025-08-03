@@ -276,27 +276,27 @@ def get_image_from_entry(entry, source, headline):
 
 def explain_with_ai(summary):
     if not os.environ.get("GROQ_API_KEY"): 
-        return "AI is not configured."
+        return f"**Article Summary:**\n\n{summary}\n\nThis article discusses the key developments and implications of the reported events. For more detailed information and complete coverage, please read the original article using the link below."
     try:
         chat_completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are a news analyst. Expand the summary into a clear, 2-3 paragraph explanation. Focus on context and importance. Use clean markdown."
+                    "content": "You are a professional news analyst. Create a comprehensive, detailed explanation of the news story in 4-6 well-structured paragraphs. Include context, background information, implications, and analysis. Write in a clear, engaging style suitable for readers who want to understand the full story. Use proper markdown formatting for readability."
                 }, 
                 {
                     "role": "user", 
-                    "content": f"Explain: {summary}"
+                    "content": f"Please provide a detailed analysis and explanation of this news story: {summary}"
                 }
             ], 
             model="llama3-8b-8192",
-            max_tokens=int(os.environ.get("MAX_TOKENS", 200)),
+            max_tokens=800,  # Increased from 200 to 800 for longer explanations
             temperature=float(os.environ.get("TEMPERATURE", 0.01))
         )
         return chat_completion.choices[0].message.content
     except Exception as e: 
         print(f"AI explanation error: {e}")
-        return "Could not generate AI explanation."
+        return f"**Article Summary:**\n\n{summary}\n\nThis article discusses the key developments and implications of the reported events. For more detailed information and complete coverage, please read the original article using the link below."
 
 # --- Core News Fetching ---
 def fetch_and_process_news():

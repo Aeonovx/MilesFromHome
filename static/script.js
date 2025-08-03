@@ -237,8 +237,10 @@ function renderCategorySelector(categories, activeCategory) {
     container.innerHTML = categories.map(cat => `
         <button class="${activeCategory === cat ? 'active' : ''}" 
                 onclick="fetchNews(document.getElementById('search-bar').value, '${cat}')">
-            <span class="icon">${icons[cat] || '•'}</span> 
-            ${cat}
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="icon">${icons[cat] || '•'}</span> 
+                <span>${cat}</span>
+            </div>
             <span class="count">(${categoryCounts[cat] || 0})</span>
         </button>
     `).join('');

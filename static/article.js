@@ -31,17 +31,30 @@ function renderArticle(article) {
     
     if (!imageUrl || imageUrl.trim() === '') {
         const sourceColors = {
-            "Reuters": "2e5266",
+            "Reuters": "ff6600",
             "BBC News": "bb1919", 
             "The Guardian": "052962",
             "TechCrunch": "00d084",
-            "Associated Press": "0066cc"
+            "Associated Press": "0066cc",
+            "Tech Reuters": "ff6600",
+            "EU Guardian": "003399",
+            "Travel Guardian": "ff6b35",
+            "Tech Guardian": "052962"
         };
         
         const color = sourceColors[article.source] || "1a1f26";
         const encodedSource = encodeURIComponent(article.source);
-        imageUrl = `https://via.placeholder.com/800x400/${color}/ffffff?text=${encodedSource}`;
+        imageUrl = `https://via.placeholder.com/900x400/${color}/ffffff?text=${encodedSource}`;
     }
+
+    // Format the date properly
+    const publishedDate = article.published !== "N/A" 
+        ? new Date(article.published).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })
+        : "Recent";
 
     container.innerHTML = `
         <div class="article-image-container">
@@ -53,16 +66,16 @@ function renderArticle(article) {
         <h1>${article.headline}</h1>
         <div class="meta-info">
             <span>By <strong>${article.source}</strong></span>
-            <span>${new Date(article.published).toLocaleDateString()}</span>
+            <span>${publishedDate}</span>
         </div>
         <div class="share-buttons">
             <span>Share:</span>
-            <a href="https://wa.me/?text=${encodeURIComponent(article.headline + ' ' + article.link)}" target="_blank">WhatsApp</a>
-            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(article.link)}&text=${encodeURIComponent(article.headline)}" target="_blank">Twitter</a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(article.link)}" target="_blank">Facebook</a>
+            <a href="https://wa.me/?text=${encodeURIComponent(article.headline + ' - ' + window.location.href)}" target="_blank">WhatsApp</a>
+            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(article.headline)}" target="_blank">Twitter</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank">Facebook</a>
         </div>
         <div class="explained-text">
-            ${marked.parse(article.explained_version)}
+            ${marked.parse(article.explained_version || article.summary)}
         </div>
         <a href="${article.link}" target="_blank" class="read-more-btn">Read Original Article &rarr;</a>
     `;
